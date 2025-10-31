@@ -1,0 +1,281 @@
+# InterCampus Backend
+
+Express.js REST API server with MySQL database integration.
+
+## Tech Stack
+
+- **Express.js 5** - Web framework
+- **MySQL2** - MySQL client with Promise support
+- **dotenv** - Environment variable management
+- **nodemon** - Development auto-restart
+
+## Getting Started
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Configure Environment
+
+Copy `.env.example` to `.env` and update with your credentials:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```env
+PORT=3000
+NODE_ENV=development
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=your_mysql_user
+DB_PASSWORD=your_mysql_password
+DB_DATABASE=intercampus
+```
+
+**Important:** Never commit `.env` to version control. It's already in `.gitignore`.
+
+### Create Database
+
+Create a MySQL database:
+
+```sql
+CREATE DATABASE intercampus;
+```
+
+### Start Development Server
+
+```bash
+npm run dev
+```
+
+Server runs on `http://localhost:3000` with auto-restart on file changes.
+
+### Start Production Server
+
+```bash
+npm start
+```
+
+## Available Scripts
+
+- `npm run dev` - Start with nodemon (auto-restart on changes)
+- `npm start` - Start in production mode
+
+## Project Structure
+
+```
+backend/
+├── src/
+│   ├── index.js              # Express app entry point
+│   ├── db.js                 # MySQL connection pool
+│   ├── controllers/          # Route handlers
+│   │   └── healthController.js
+│   ├── routes/               # API routes
+│   │   └── index.js
+│   ├── middleware/           # Custom middleware
+│   │   └── errorHandler.js
+│   └── models/               # Data models
+│       └── userModel.js
+├── .env                      # Environment variables (gitignored)
+├── .env.example              # Environment template
+├── .gitignore
+└── package.json
+```
+
+## API Endpoints
+
+### Root
+```
+GET /
+Response: { "ok": true, "env": "development" }
+```
+
+### Health Check
+```
+GET /api/health
+Response: { "status": "ok" }
+```
+
+## Database Connection
+
+The app uses `mysql2/promise` for async/await database operations.
+
+### Using the Database Pool
+
+```javascript
+const { pool } = require('./db');
+
+// Example query
+async function getUsers() {
+  const [rows] = await pool.query('SELECT * FROM users');
+  return rows;
+}
+```
+
+### Connection Configuration
+
+Database configuration is in `src/db.js`. It reads from environment variables:
+
+- `DB_HOST` - MySQL server host
+- `DB_PORT` - MySQL server port (default: 3306)
+- `DB_USER` - Database username
+- `DB_PASSWORD` - Database password
+- `DB_DATABASE` - Database name
+
+The pool settings:
+- `connectionLimit: 10` - Max concurrent connections
+- `waitForConnections: true` - Queue requests when limit reached
+- `queueLimit: 0` - No limit on queued requests
+
+## Error Handling
+
+Global error handler in `src/middleware/errorHandler.js` catches all errors.
+
+Example usage in routes:
+
+```javascript
+router.get('/example', async (req, res, next) => {
+  try {
+    // Your code here
+    res.json({ success: true });
+  } catch (error) {
+    next(error); // Pass to error handler
+  }
+});
+```
+
+## Adding New Routes
+
+1. Create controller in `src/controllers/`:
+
+```javascript
+// src/controllers/userController.js
+exports.getUsers = async (req, res, next) => {
+  try {
+    const { pool } = require('../db');
+    const [users] = await pool.query('SELECT * FROM users');
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+```
+
+2. Add route in `src/routes/index.js`:
+
+```javascript
+const { getUsers } = require('../controllers/userController');
+router.get('/users', getUsers);
+```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `3000` |
+| `NODE_ENV` | Environment mode | `development` |
+| `DB_HOST` | MySQL host | Required |
+| `DB_PORT` | MySQL port | `3306` |
+| `DB_USER` | MySQL username | Required |
+| `DB_PASSWORD` | MySQL password | Required |
+| `DB_DATABASE` | Database name | Required |
+
+## Security Best Practices
+
+- ✅ Environment variables in `.env` (gitignored)
+- ✅ No hardcoded credentials in source code
+- ⚠️ Add input validation for production
+- ⚠️ Add authentication/authorization middleware
+- ⚠️ Use HTTPS in production
+- ⚠️ Add rate limiting
+- ⚠️ Sanitize database inputs (use parameterized queries)
+
+## Troubleshooting
+
+### Server won't start
+
+**Check dependencies:**
+```bash
+npm install
+```
+
+**Check port availability:**
+```bash
+# Windows PowerShell
+netstat -ano | findstr :3000
+
+# Kill process if needed
+taskkill /PID <process_id> /F
+```
+
+### Database connection fails
+
+**Verify MySQL is running:**
+```bash
+# Check MySQL service status
+```
+
+**Test connection:**
+```bash
+mysql -h localhost -u your_user -p
+```
+
+**Check credentials in `.env`:**
+- Ensure `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE` are correct
+- Database must exist (create it if needed)
+
+**Check firewall:**
+- Ensure MySQL port (3306) is accessible
+
+### Module not found
+
+Clear cache and reinstall:
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+## Development Tips
+
+### Auto-restart on changes
+`nodemon` watches `src/` folder and restarts automatically.
+
+### Database Migrations
+Consider adding a migration tool like:
+- `knex` - SQL query builder with migrations
+- `sequelize` - ORM with migrations
+- `db-migrate` - Database migration framework
+
+### API Testing
+Use tools like:
+- Postman
+- Thunder Client (VS Code extension)
+- curl
+- Insomnia
+
+Example curl test:
+```bash
+curl http://localhost:3000/api/health
+```
+
+## Next Steps
+
+- [ ] Add authentication (JWT, sessions)
+- [ ] Add input validation (express-validator, joi)
+- [ ] Add database migrations
+- [ ] Add API documentation (Swagger/OpenAPI)
+- [ ] Add unit tests (Jest, Mocha)
+- [ ] Add logging (winston, morgan)
+- [ ] Add CORS configuration for frontend
+- [ ] Add rate limiting (express-rate-limit)
+
+## Learn More
+
+- [Express.js Documentation](https://expressjs.com/)
+- [MySQL2 Documentation](https://github.com/sidorares/node-mysql2)
+- [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices)
