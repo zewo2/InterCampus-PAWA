@@ -13,30 +13,30 @@ export default function Footer() {
         <div className="footer-column">
           <h4>Para Estudantes</h4>
           <ul>
-            <li>Buscar Estágios</li>
-            <li>Criar Perfil</li>
-            <li>Dicas de Carreira</li>
-            <li>Blog</li>
+            <li><a href="/estagios">Buscar Estágios</a></li>
+            <li><a href="/perfil">Criar Perfil</a></li>
+            <li><a href="/carreira">Dicas de Carreira</a></li>
+            <li><a href="/blog">Blog</a></li>
           </ul>
         </div>
-
+        
         <div className="footer-column">
           <h4>Para Empresas</h4>
           <ul>
-            <li>Publicar Vaga</li>
-            <li>Buscar Candidatos</li>
-            <li>Planos</li>
-            <li>Recursos</li>
+            <li><a href="/publicar-vaga">Publicar Vaga</a></li>
+            <li><a href="/candidatos">Buscar Candidatos</a></li>
+            <li><a href="/planos">Planos</a></li>
+            <li><a href="/recursos">Recursos</a></li>
           </ul>
         </div>
 
         <div className="footer-column">
           <h4>Suporte</h4>
           <ul>
-            <li>Central de Ajuda</li>
-            <li>Contato</li>
-            <li>Termos de Uso</li>
-            <li>Privacidade</li>
+            <li><a href="/ajuda">Central de Ajuda</a></li>
+            <li><a href="/contato">Contato</a></li>
+            <li><a href="/termos">Termos de Uso</a></li>
+            <li><a href="/privacidade">Privacidade</a></li>
           </ul>
         </div>
       </div>
@@ -49,7 +49,6 @@ export default function Footer() {
           <img src={complaintsImg} alt="Livro de Reclamações" className="complaints-img" />
         </a>
       </div>
-      
     </footer>
   )
 }
