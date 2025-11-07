@@ -2,7 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
-const { testConnection } = require('./db');
+const { testConnection } = require('./database/db');
 
 const app = express();
 app.use(express.json());
