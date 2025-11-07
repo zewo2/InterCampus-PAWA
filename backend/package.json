@@ -8,11 +8,15 @@
     "create-db": "node src/database/createdatabase.js",
     "create-tables": "node src/database/createtables.js",
     "seed-db": "node src/database/exampledata.js",
+    "reset-db": "node src/database/resetdb.js && node src/database/exampledata.js",
     "init-db": "npm run create-db && npm run create-tables && npm run seed-db"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3"
   },
   "devDependencies": {
