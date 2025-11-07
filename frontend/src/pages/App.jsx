@@ -8,8 +8,9 @@ const App = () => {
     <div>
       <Header />
       <Home />
+      <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
