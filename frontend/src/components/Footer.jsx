@@ -3,7 +3,7 @@ import complaintsImg from '../assets/Livrodereclamações.png'
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-800 text-white/90 relative left-1/2 -ml-[50vw] w-[100vw] box-border pt-4 pb-2 mt-5">
+    <footer className="bg-gray-900 text-white pt-12 pb-6 m-0">
       <div className="max-w-[1200px] mx-auto flex gap-4 px-3 py-2 flex-wrap items-center">
         <div className="flex-1 min-w-[140px]">
           <h3 className="text-base font-semibold mb-1">InterCampus</h3>
