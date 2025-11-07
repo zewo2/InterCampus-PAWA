@@ -16,7 +16,7 @@ async function insertExampleData() {
 
     // 1. Inserir Utilizadores
     await connection.query(`
-      INSERT INTO Utilizador (nome, email, password, role) VALUES
+      INSERT IGNORE INTO Utilizador (nome, email, password, role) VALUES
       -- Empresas 
       ('Farfetch', 'careers@farfetch.com', 'hash123', 'Empresa'),
       ('Critical Software', 'careers@criticalsoftware.com', 'hash456', 'Empresa'),
@@ -49,7 +49,7 @@ async function insertExampleData() {
 
     // 2. Inserir Empresas
     await connection.query(`
-      INSERT INTO Empresa (nome_empresa, NIF, morada, validada, id_utilizador) VALUES
+      INSERT IGNORE INTO Empresa (nome_empresa, NIF, morada, validada, id_utilizador) VALUES
       ('Farfetch', '510661718', 'Rua da Lionesa, 446, 4465-671 Leça do Balio, Matosinhos', true, 1),
       ('Critical Software', '502028351', 'Rua de Gonçalo Cristóvão, 347, 4000-270 Porto', true, 2),
       ('Sword Health', '514333261', 'Alameda de Espregueira, 319, 4200-272 Porto', true, 3),
@@ -60,7 +60,7 @@ async function insertExampleData() {
 
     // 3. Inserir Orientadores de Empresa
     await connection.query(`
-      INSERT INTO OrientadorEmpresa (nome, cargo, email, telefone, id_empresa) VALUES
+      INSERT IGNORE INTO OrientadorEmpresa (nome, cargo, email, telefone, id_empresa) VALUES
       ('Dr. Miguel Ferreira', 'Engineering Manager', 'miguel.ferreira@farfetch.com', '912345678', 1),
       ('Eng. Sofia Almeida', 'Tech Lead', 'sofia.almeida@criticalsoftware.com', '923456789', 2),
       ('Dr. Paulo Santos', 'Head of Engineering', 'paulo.santos@swordhealth.com', '934567890', 3),
@@ -71,7 +71,7 @@ async function insertExampleData() {
 
     // 4. Inserir Alunos
     await connection.query(`
-      INSERT INTO Aluno (curso, CV, competencias, area_interesse, id_utilizador, estagio_status) VALUES
+      INSERT IGNORE INTO Aluno (curso, CV, competencias, area_interesse, id_utilizador, estagio_status) VALUES
       ('Engenharia Informática', 'Estudante apaixonado por backend development...', 'Java, Spring Boot, MySQL, Docker, Kubernetes', 'Desenvolvimento Backend', 6, false),
       ('Engenharia Informática', 'Desenvolvedora frontend com experiência em React...', 'React, Node.js, MongoDB, TypeScript, GraphQL', 'Desenvolvimento Web', 7, true),
       ('Design Digital', 'Designer focado em experiência do utilizador...', 'Figma, Adobe XD, UI/UX, Photoshop, Illustrator', 'Design de Interfaces', 8, false),
@@ -87,13 +87,13 @@ async function insertExampleData() {
 
     // 5. Inserir Gestores
     await connection.query(`
-      INSERT INTO Gestor (id_utilizador) VALUES (21), (22), (23)
+      INSERT IGNORE INTO Gestor (id_utilizador) VALUES (21), (22), (23)
     `);
     console.log('Gestores inseridos (3 total)');
 
     // 6. Inserir Professores Orientadores
     await connection.query(`
-      INSERT INTO ProfessorOrientador (departamento, id_utilizador) VALUES
+      INSERT IGNORE INTO ProfessorOrientador (departamento, id_utilizador) VALUES
       ('Departamento de Informática', 16),
       ('Departamento de Engenharia', 17),
       ('Departamento de Design', 18),
@@ -104,7 +104,7 @@ async function insertExampleData() {
 
     // 7. Inserir Ofertas de Estágio 
     await connection.query(`
-      INSERT INTO OfertaEstagio (titulo, descricao, requisitos, duracao, local, data_publicacao, id_empresa) VALUES
+      INSERT IGNORE INTO OfertaEstagio (titulo, descricao, requisitos, duracao, local, data_publicacao, id_empresa) VALUES
       ('Backend Developer - Java', 'Desenvolvimento de microserviços para plataforma de e-commerce de luxo', 'Java, Spring Boot, Kafka, Redis', 6, 'Matosinhos', '2024-01-15', 1),
       ('Frontend Developer - React', 'Criação de interfaces web responsivas e modernas', 'React, TypeScript, Next.js, Tailwind', 6, 'Matosinhos', '2024-01-20', 1),
       ('DevOps Engineer', 'Automação de infraestrutura e CI/CD pipelines', 'Docker, Kubernetes, AWS, Terraform', 6, 'Porto', '2024-02-01', 2),
@@ -125,7 +125,7 @@ async function insertExampleData() {
 
     // 8. Inserir Candidaturas
     await connection.query(`
-      INSERT INTO Candidatura (data_submissao, estado, id_aluno, id_oferta) VALUES
+      INSERT IGNORE INTO Candidatura (data_submissao, estado, id_aluno, id_oferta) VALUES
       ('2024-01-20', 'Aceite', 1, 1),
       ('2024-02-05', 'Aceite', 2, 5),
       ('2024-01-25', 'Pendente', 3, 8),
@@ -141,7 +141,7 @@ async function insertExampleData() {
 
     // 9. Inserir Estágios
     await connection.query(`
-      INSERT INTO Estagio (data_inicio, data_fim, estado_final, id_candidatura, id_professor, id_orientador) VALUES
+      INSERT IGNORE INTO Estagio (data_inicio, data_fim, estado_final, id_candidatura, id_professor, id_orientador) VALUES
       ('2024-03-01', '2024-08-31', 'Concluido', 1, 1, 1),
       ('2024-03-15', '2024-09-15', 'Concluido', 2, 2, 3),
       ('2024-04-01', '2024-09-30', 'Concluido', 5, 3, 2),
@@ -152,7 +152,7 @@ async function insertExampleData() {
 
     // 10. Inserir Avaliações
     await connection.query(`
-      INSERT INTO Avaliacao (tipo, data, pontuacao, relatorio_texto, id_estagio) VALUES
+      INSERT IGNORE INTO Avaliacao (tipo, data, pontuacao, relatorio_texto, id_estagio) VALUES
       ('Acompanhamento', '2024-05-15', 16, 'Excelente integração na equipa. Demonstra boas competências técnicas em Java e Spring Boot.', 1),
       ('Final', '2024-08-31', 18, 'Performance excecional. Contribuiu significativamente para o projeto de microserviços.', 1),
       ('Acompanhamento', '2024-06-01', 17, 'Muito competente em desenvolvimento full-stack. Proativa e autónoma.', 2),

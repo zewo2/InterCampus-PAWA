@@ -2,6 +2,8 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const mysql = require('mysql2');
 
+const dbName = process.env.DB_DATABASE;
+
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
@@ -13,9 +15,9 @@ connection.connect(function(err) {
     if (err) throw err;
     console.log('Conectado ao MySQL!');
 
-    connection.query("CREATE DATABASE IF NOT EXISTS intercampus_db", function(err, result) {
+    connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``, function(err, result) {
         if (err) throw err;
-        console.log("Base de Dados 'intercampus_db' criada com sucesso!");
+        console.log(`Base de Dados '${dbName}' criada com sucesso!`);
         connection.end();
     });
 });
