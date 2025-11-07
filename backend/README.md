@@ -6,6 +6,9 @@ Express.js REST API server with MySQL database integration.
 
 - **Express.js 5** - Web framework
 - **MySQL2** - MySQL client with Promise support
+- **bcryptjs** - Password hashing
+- **jsonwebtoken** - JWT authentication
+- **cors** - CORS middleware
 - **dotenv** - Environment variable management
 - **nodemon** - Development auto-restart
 
@@ -30,21 +33,33 @@ Edit `.env`:
 ```env
 PORT=3000
 NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+JWT_SECRET=your-secret-key-change-in-production
+JWT_EXPIRES_IN=24h
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=your_mysql_user
 DB_PASSWORD=your_mysql_password
-DB_DATABASE=intercampus
+DB_DATABASE=intercampus_db
 ```
 
 **Important:** Never commit `.env` to version control. It's already in `.gitignore`.
 
 ### Create Database
 
-Create a MySQL database:
+Run the initialization scripts to create and populate the database:
 
-```sql
-CREATE DATABASE intercampus;
+```bash
+# Create database and tables
+npm run init-db
+
+# Or run steps individually:
+npm run create-db      # Creates the database
+npm run create-tables  # Creates all tables
+npm run seed-db        # Populates with example data
+
+# Reset database (truncate and reseed)
+npm run reset-db
 ```
 
 ### Start Development Server
@@ -65,6 +80,11 @@ npm start
 
 - `npm run dev` - Start with nodemon (auto-restart on changes)
 - `npm start` - Start in production mode
+- `npm run init-db` - Initialize database (create-db + create-tables + seed-db)
+- `npm run create-db` - Create the database
+- `npm run create-tables` - Create all database tables
+- `npm run seed-db` - Populate database with example data
+- `npm run reset-db` - Reset database (truncate all tables and reseed)
 
 ## Project Structure
 
@@ -72,15 +92,43 @@ npm start
 backend/
 ├── src/
 │   ├── index.js              # Express app entry point
-│   ├── db.js                 # MySQL connection pool
 │   ├── controllers/          # Route handlers
-│   │   └── healthController.js
+│   │   ├── authController.js
+│   │   ├── alunoController.js
+│   │   ├── empresaController.js
+│   │   ├── ofertaEstagioController.js
+│   │   ├── candidaturaController.js
+│   │   ├── estagioController.js
+│   │   ├── avaliacaoController.js
+│   │   ├── professorController.js
+│   │   ├── gestorController.js
+│   │   ├── homeController.js
+│   │   ├── healthController.js
+│   │   └── viewController.js
 │   ├── routes/               # API routes
-│   │   └── index.js
-│   ├── middleware/           # Custom middleware
+│   │   ├── index.js          # Route aggregator
+│   │   ├── auth.js
+│   │   ├── alunos.js
+│   │   ├── empresas.js
+│   │   ├── ofertas.js
+│   │   ├── candidaturas.js
+│   │   ├── estagios.js
+│   │   ├── avaliacoes.js
+│   │   ├── professores.js
+│   │   ├── gestores.js
+│   │   ├── home.js
+│   │   └── views.js
+│   ├── middlewares/          # Custom middleware
+│   │   ├── authMiddleware.js # JWT verification & authorization
 │   │   └── errorHandler.js
-│   └── models/               # Data models
-│       └── userModel.js
+│   ├── models/               # Data models
+│   │   └── userModel.js
+│   └── database/             # Database scripts
+│       ├── db.js             # MySQL connection pool
+│       ├── createdatabase.js
+│       ├── createtables.js
+│       ├── exampledata.js
+│       └── resetdb.js
 ├── .env                      # Environment variables (gitignored)
 ├── .env.example              # Environment template
 ├── .gitignore
@@ -89,21 +137,128 @@ backend/
 
 ## API Endpoints
 
-### Root
+### Authentication
 ```
-GET /
-Response: { "ok": true, "env": "development" }
+POST   /api/auth/register    # Register new user
+POST   /api/auth/login       # Login user
+GET    /api/auth/me          # Get current user (protected)
+POST   /api/auth/recover     # Password recovery
+```
+
+### Home
+```
+GET    /api/home             # Get homepage data (stats, featured offers, categories)
+```
+
+### Empresas
+```
+GET    /api/empresas         # Get all companies (public)
+GET    /api/empresas/:id     # Get company by ID (public)
+POST   /api/empresas         # Create company (protected: Empresa)
+PUT    /api/empresas/:id     # Update company (protected: Empresa, Gestor)
+PATCH  /api/empresas/:id/validate  # Validate company (protected: Gestor)
+GET    /api/empresas/:id/ofertas   # Get company's job offers (public)
+```
+
+### Ofertas de Estágio
+```
+GET    /api/ofertas          # Get all offers (public)
+GET    /api/ofertas/:id      # Get offer by ID (public)
+POST   /api/ofertas          # Create offer (protected: Empresa)
+PUT    /api/ofertas/:id      # Update offer (protected: Empresa, Gestor)
+DELETE /api/ofertas/:id      # Delete offer (protected: Empresa, Gestor)
+GET    /api/ofertas/:id/candidaturas  # Get offer applications (protected: Empresa, Gestor)
+```
+
+### Candidaturas
+```
+GET    /api/candidaturas     # Get all applications (protected, filtered by role)
+GET    /api/candidaturas/:id # Get application by ID (protected)
+POST   /api/candidaturas     # Create application (protected: Aluno)
+PATCH  /api/candidaturas/:id/status  # Update status (protected: Empresa, Gestor)
+DELETE /api/candidaturas/:id # Delete application (protected: Aluno, Gestor)
+```
+
+### Alunos
+```
+GET    /api/alunos           # Get all students (protected)
+GET    /api/alunos/:id       # Get student by ID (protected)
+PUT    /api/alunos/:id       # Update student (protected: Aluno, Gestor)
+DELETE /api/alunos/:id       # Delete student (protected: Gestor)
+GET    /api/alunos/:id/candidaturas  # Get student's applications (protected)
+GET    /api/alunos/:id/estagio        # Get student's internship (protected)
+```
+
+### Estágios
+```
+GET    /api/estagios         # Get all internships (protected)
+GET    /api/estagios/:id     # Get internship by ID (protected)
+POST   /api/estagios         # Create internship (protected: Gestor)
+PUT    /api/estagios/:id     # Update internship (protected: Gestor)
+DELETE /api/estagios/:id     # Delete internship (protected: Gestor)
+GET    /api/estagios/:id/avaliacoes  # Get internship evaluations (protected)
+```
+
+### Avaliações
+```
+GET    /api/avaliacoes       # Get all evaluations (protected)
+GET    /api/avaliacoes/:id   # Get evaluation by ID (protected)
+POST   /api/avaliacoes       # Create evaluation (protected: Professor, Empresa)
+PUT    /api/avaliacoes/:id   # Update evaluation (protected: Professor, Empresa)
+DELETE /api/avaliacoes/:id   # Delete evaluation (protected: Gestor)
+```
+
+### Professores
+```
+GET    /api/professores      # Get all professors (protected)
+GET    /api/professores/:id  # Get professor by ID (protected)
+PUT    /api/professores/:id  # Update professor (protected: Professor, Gestor)
+GET    /api/professores/:id/estagios  # Get supervised internships (protected)
+```
+
+### Gestores
+```
+GET    /api/gestores         # Get all managers (protected: Gestor)
+GET    /api/gestores/dashboard  # Get dashboard stats (protected: Gestor)
 ```
 
 ### Health Check
 ```
-GET /api/health
-Response: { "status": "ok" }
+GET    /api/health           # Server health check
+```
+
+### View Routes (Dummy Pages)
+```
+GET    /login                # Login page placeholder
+GET    /register             # Register page placeholder
+GET    /dashboard            # Dashboard page placeholder
+GET    /ofertas              # Offers page placeholder
+GET    /perfil               # Profile page placeholder
+GET    /candidaturas         # Applications page placeholder
+GET    /estagios             # Internships page placeholder
+GET    /avaliacoes           # Evaluations page placeholder
+GET    /empresas             # Companies page placeholder
+GET    /alunos               # Students page placeholder
+GET    /professores          # Professors page placeholder
 ```
 
 ## Database Connection
 
 The app uses `mysql2/promise` for async/await database operations.
+
+### Database Schema
+
+The database includes the following tables:
+- **Utilizador** - User accounts (Empresa, Aluno, Professor, Gestor)
+- **Empresa** - Company profiles
+- **OrientadorEmpresa** - Company supervisors
+- **Aluno** - Student profiles
+- **Gestor** - Manager profiles
+- **ProfessorOrientador** - Professor profiles
+- **OfertaEstagio** - Internship offers
+- **Candidatura** - Applications to internships
+- **Estagio** - Active internships
+- **Avaliacao** - Internship evaluations
 
 ### Using the Database Pool
 
@@ -179,6 +334,9 @@ router.get('/users', getUsers);
 |----------|-------------|---------|
 | `PORT` | Server port | `3000` |
 | `NODE_ENV` | Environment mode | `development` |
+| `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:5173` |
+| `JWT_SECRET` | Secret key for JWT tokens | Required |
+| `JWT_EXPIRES_IN` | JWT token expiration time | `24h` |
 | `DB_HOST` | MySQL host | Required |
 | `DB_PORT` | MySQL port | `3306` |
 | `DB_USER` | MySQL username | Required |
@@ -189,11 +347,15 @@ router.get('/users', getUsers);
 
 - ✅ Environment variables in `.env` (gitignored)
 - ✅ No hardcoded credentials in source code
-- ⚠️ Add input validation for production
-- ⚠️ Add authentication/authorization middleware
+- ✅ JWT authentication implemented
+- ✅ Password hashing with bcryptjs
+- ✅ Role-based authorization (Empresa, Aluno, Professor, Gestor)
+- ✅ CORS configured for frontend
+- ✅ Parameterized queries to prevent SQL injection
+- ⚠️ Use strong JWT_SECRET in production
 - ⚠️ Use HTTPS in production
-- ⚠️ Add rate limiting
-- ⚠️ Sanitize database inputs (use parameterized queries)
+- ⚠️ Add rate limiting for production
+- ⚠️ Add input validation (consider express-validator)
 
 ## Troubleshooting
 
@@ -265,14 +427,16 @@ curl http://localhost:3000/api/health
 
 ## Next Steps
 
-- [ ] Add authentication (JWT, sessions)
+- [x] Add authentication (JWT)
+- [x] Add role-based authorization
+- [x] Add CORS configuration for frontend
+- [x] Add database scripts (create, seed, reset)
 - [ ] Add input validation (express-validator, joi)
-- [ ] Add database migrations
 - [ ] Add API documentation (Swagger/OpenAPI)
 - [ ] Add unit tests (Jest, Mocha)
 - [ ] Add logging (winston, morgan)
-- [ ] Add CORS configuration for frontend
 - [ ] Add rate limiting (express-rate-limit)
+- [ ] Add file upload support (multer) for CVs and documents
 
 ## Learn More
 
