@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "create-db": "node src/database/createdatabase.js",
+    "create-tables": "node src/database/createtables.js",
+    "seed-db": "node src/database/exampledata.js",
+    "init-db": "npm run create-db && npm run create-tables && npm run seed-db"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
