@@ -47,8 +47,6 @@ export default function Footer() {
           <img src={complaintsImg} alt="Livro de Reclamações" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
         </a>
       </div>
-
     </footer>
   )
 }
- 
