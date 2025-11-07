@@ -106,6 +106,8 @@ function Home() {
         </div>
       </section>
 
+TODO: Remake visual layout of the new and old pages
+
       {/* Highlighted Internships */}
       <section className="py-16 px-4 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Estágios em Destaque</h2>
