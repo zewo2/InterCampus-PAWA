@@ -29,7 +29,7 @@ function Home() {
             <input type="text" placeholder="Cargo ou palavra-chave" className="search-input" />
             <input type="text" placeholder="Localização" className="search-input" />
             <select className="search-select">
-            <option value="">Área de Estudo</option>
+            <option value="estudo" classname="study">Área de Estudo</option>
             <option value="marketing">Marketing</option>
             <option value="tecnologia">Tecnologia</option>
             <option value="design">Design</option>

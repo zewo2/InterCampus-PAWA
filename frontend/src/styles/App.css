@@ -419,3 +419,9 @@ button {
   background-color: #1e40af;
   transform: scale(0.98);
 }
+
+.studo {
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 20px;
+}
