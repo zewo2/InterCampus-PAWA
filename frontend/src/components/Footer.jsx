@@ -13,30 +13,30 @@ export default function Footer() {
         <div className="flex-1 min-w-[140px]">
           <h4 className="text-sm font-medium mb-1">Para Estudantes</h4>
           <ul className="text-sm text-white/80 space-y-1">
-            <li>Buscar Estágios</li>
-            <li>Criar Perfil</li>
-            <li>Dicas de Carreira</li>
-            <li>Blog</li>
+            <li><a href="/estagios">Buscar Estágios</a></li>
+            <li><a href="/perfil">Criar Perfil</a></li>
+            <li><a href="/carreira">Dicas de Carreira</a></li>
+            <li><a href="/blog">Blog</a></li>
           </ul>
         </div>
-
+        
         <div className="flex-1 min-w-[140px]">
           <h4 className="text-sm font-medium mb-1">Para Empresas</h4>
           <ul className="text-sm text-white/80 space-y-1">
-            <li>Publicar Vaga</li>
-            <li>Buscar Candidatos</li>
-            <li>Planos</li>
-            <li>Recursos</li>
+            <li><a href="/publicar-vaga">Publicar Vaga</a></li>
+            <li><a href="/candidatos">Buscar Candidatos</a></li>
+            <li><a href="/planos">Planos</a></li>
+            <li><a href="/recursos">Recursos</a></li>
           </ul>
         </div>
 
         <div className="flex-1 min-w-[140px]">
           <h4 className="text-sm font-medium mb-1">Suporte</h4>
           <ul className="text-sm text-white/80 space-y-1">
-            <li>Central de Ajuda</li>
-            <li>Contato</li>
-            <li>Termos de Uso</li>
-            <li>Privacidade</li>
+            <li><a href="/ajuda">Central de Ajuda</a></li>
+            <li><a href="/contato">Contato</a></li>
+            <li><a href="/termos">Termos de Uso</a></li>
+            <li><a href="/privacidade">Privacidade</a></li>
           </ul>
         </div>
       </div>
