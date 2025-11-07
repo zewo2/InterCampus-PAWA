@@ -11,54 +11,78 @@ function Home() {
             <p className="hero-description">
               Conectamos estudantes talentosos com as melhores oportunidades de estágio em empresas de destaque
             </p>
-            <div className="hero-buttons">
-              <button className="btn-primary">Buscar Estágios</button>
-              <button className="btn-secondary">Para Empresas</button>
+            <div className="flex gap-4 mt-6">
+              <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                Buscar Estágios
+              </button>
+              <button className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                Para Empresas
+              </button>
             </div>
           </div>
-          <div className="hero-image">
-            <img src="https://img.freepik.com/fotos-gratis/pessoas-em-reuniao-de-negocios-em-alto-angulo_23-2148911819.jpg" alt="Imagem de pessoas em reunião" />
+          <div className="flex-1">
+            <img 
+              src="https://img.freepik.com/fotos-gratis/pessoas-em-reuniao-de-negocios-em-alto-angulo_23-2148911819.jpg" 
+              alt="Imagem de pessoas em reunião" 
+              className="w-full h-auto rounded-2xl shadow-lg object-cover"
+            />
           </div>
         </header>
       </section>
 
       {/* Search Section */}
-      <section className="search">
-        <h2 className="search-title">Busque por Estágios</h2>
-        <div className="search-bar">
-            <input type="text" placeholder="Cargo ou palavra-chave" className="search-input" />
-            <input type="text" placeholder="Localização" className="search-input" />
-            <select className="search-select">
-            <option value="estudo" classname="study">Área de Estudo</option>
-            <option value="marketing">Marketing</option>
-            <option value="tecnologia">Tecnologia</option>
-            <option value="design">Design</option>
+      <section className="py-16 px-4 bg-gray-50">
+        <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Busque por Estágios</h2>
+        <div className="max-w-5xl mx-auto flex flex-wrap gap-4 items-center justify-center">
+            <input 
+              type="text" 
+              placeholder="Cargo ou palavra-chave" 
+              className="flex-1 min-w-[200px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <input 
+              type="text" 
+              placeholder="Localização" 
+              className="flex-1 min-w-[200px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <select className="flex-1 min-w-[200px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value="estudo">Área de Estudo</option>
+              <option value="marketing">Marketing</option>
+              <option value="tecnologia">Tecnologia</option>
+              <option value="design">Design</option>
             </select>
-            <button className="btn-primary">Buscar</button>
+            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+              Buscar
+            </button>
         </div>
-        </section>
+      </section>
 
       {/* Highlighted Internships */}
-      <section className="highlighted">
-        <h2 className="section-title">Estágios em Destaque</h2>
-        <div className="internships">
-          <div className="internship-card">
-            <h3>Estágio em Desenvolvimento Web</h3>
-            <p>Google</p>
-            <p>Oportunidade para desenvolver habilidades em React, Node.js e trabalhar em projetos.</p>
-            <button className="btn-primary">Candidatar</button>
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Estágios em Destaque</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <h3 className="text-xl font-bold mb-2 text-gray-800">Estágio em Desenvolvimento Web</h3>
+            <p className="text-gray-600 font-semibold mb-3">Google</p>
+            <p className="text-gray-600 mb-4">Oportunidade para desenvolver habilidades em React, Node.js e trabalhar em projetos.</p>
+            <button className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+              Candidatar
+            </button>
           </div>
-          <div className="internship-card">
-            <h3>Estágio em Marketing Digital</h3>
-            <p>Microsoft</p>
-            <p>Participe de campanhas globais e aprenda sobre estratégias de marketing digital.</p>
-            <button className="btn-primary">Candidatar</button>
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <h3 className="text-xl font-bold mb-2 text-gray-800">Estágio em Marketing Digital</h3>
+            <p className="text-gray-600 font-semibold mb-3">Microsoft</p>
+            <p className="text-gray-600 mb-4">Participe de campanhas globais e aprenda sobre estratégias de marketing digital.</p>
+            <button className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+              Candidatar
+            </button>
           </div>
-          <div className="internship-card">
-            <h3>Estágio em UX/UI Design</h3>
-            <p>Netflix</p>
-            <p>Trabalhe na criação de interfaces que milhões de usuários utilizam diariamente.</p>
-            <button className="btn-primary">Candidatar</button>
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <h3 className="text-xl font-bold mb-2 text-gray-800">Estágio em UX/UI Design</h3>
+            <p className="text-gray-600 font-semibold mb-3">Netflix</p>
+            <p className="text-gray-600 mb-4">Trabalhe na criação de interfaces que milhões de usuários utilizam diariamente.</p>
+            <button className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+              Candidatar
+            </button>
           </div>
         </div>
       </section>
