@@ -1,61 +1,48 @@
-## 📋 Descrição
-
-<!-- Descreva as mudanças implementadas neste PR de forma clara e concisa -->
-
-## 🎯 Tipo de Mudança
-
-<!-- Marque com um 'x' as opções aplicáveis -->
-
-- [ ] 🐛 Bug fix (correção de bug)
-- [ ] ✨ Nova funcionalidade (feature)
-- [ ] 💥 Breaking change (mudança que quebra compatibilidade)
-- [ ] 📝 Documentação
-- [ ] 🎨 Refatoração de código
-- [ ] ⚡ Melhoria de performance
-- [ ] ✅ Testes
-- [ ] 🔧 Configuração/Build
-
-## 🔗 Issue Relacionada
-
-<!-- Cole o link da issue que este PR resolve -->
-
-Closes #(número da issue)
-
-## 🧪 Como Testar
-
-<!-- Descreva os passos para testar as mudanças -->
-
-1. 
-2. 
-3. 
-
-## 📸 Screenshots/Vídeos
-
-<!-- Se aplicável, adicione screenshots ou vídeos demonstrando as mudanças -->
-
-## ✅ Checklist
-
-<!-- Marque com um 'x' os itens concluídos -->
-
-- [ ] Meu código segue os padrões do projeto
-- [ ] Realizei uma auto-revisão do meu código
-- [ ] Comentei áreas complexas do código
-- [ ] Atualizei a documentação correspondente
-- [ ] Minhas mudanças não geram novos warnings
-- [ ] Adicionei testes que provam que minha correção/feature funciona
-- [ ] Testes novos e existentes passam localmente
-- [ ] Mudanças dependentes foram mergeadas e publicadas
-
-## 📝 Notas Adicionais
-
-<!-- Qualquer informação adicional relevante para os revisores -->
-
-## 🔍 Revisores Sugeridos
-
-<!-- Tag pessoas específicas que devem revisar este PR -->
-
-@
+---
+name: Pull Request
+about: Create a pull request to contribute to the project
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
-**Para o revisor:** Por favor, verifique especialmente [mencione áreas críticas]
+## Description
+
+Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
+
+Fixes # (issue)
+
+## Type of change
+
+Please delete options that are not relevant.
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] This change requires a documentation update
+
+## How Has This Been Tested?
+
+Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.
+
+- [ ] Test A
+- [ ] Test B
+
+**Test Configuration**:
+* Hardware: (eg: Windows device, MacOS device)
+
+## Checklist:
+
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published in downstream modules
+
+## Screenshots
+
+If applicable, add screenshots to help explain your changes.
