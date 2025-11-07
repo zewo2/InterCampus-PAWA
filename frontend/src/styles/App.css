@@ -40,3 +40,118 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Footer styles */
+.site-footer {
+  background-color: #1F2937;
+  color: rgba(255, 255, 255, 0.9);
+  /* reduced vertical padding for a more compact footer */
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
+  margin-top: 1.25rem;
+
+  /* Make footer full-bleed (span viewport width) even when inside a centered container */
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  box-sizing: border-box;
+}
+.site-footer .footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem; /* smaller gap between columns */
+  padding: 1rem 0.75rem; /* reduced padding */
+  flex-wrap: wrap;
+  align-items: center; /* keep columns vertically centered */
+}
+.site-footer .footer-column {
+  flex: 1 1 180px;
+  min-width: 140px;
+}
+
+/* Complaints / image column (right side on larger screens) */
+.site-footer .footer-complaints {
+  flex: 0 0 240px;
+  min-width: 160px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  text-align: right;
+}
+.site-footer .footer-complaints .complaints-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+.site-footer .complaints-img {
+  width: 7rem; /* smaller by default */
+  height: auto;
+  object-fit: contain;
+}
+.site-footer .footer-brand h3 {
+  margin: 0 0 0.15rem 0;
+  font-size: 1rem; /* slightly smaller */
+}
+.site-footer h4 {
+  margin: 0 0 0.35rem 0;
+  font-size: 0.95rem; /* slightly smaller */
+}
+.site-footer p, .site-footer li {
+  color: rgba(255,255,255,0.8);
+  margin: 0.12rem 0; /* less vertical spacing */
+  line-height: 1.45;
+}
+.site-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: 0.6rem; /* reduced gap above bottom bar */
+  padding: 0.45rem 0.5rem; /* smaller vertical padding */
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .site-footer .footer-inner {
+    flex-direction: column;
+    gap: 0.75rem; /* slightly smaller gap on mobile */
+  }
+  .site-footer .footer-complaints {
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    flex: 1 1 100%;
+  }
+  .site-footer .footer-complaints .complaints-inner {
+    align-items: center;
+  }
+  /* smaller image on small screens */
+  .site-footer .complaints-img {
+    width: 6rem;
+  }
+}
+
+/* Dedicated container to align the image horizontally to the right without changing vertical placement */
+.footer-image-right {
+  display: flex;
+  justify-content: flex-end; /* push image to the right */
+  align-items: center; /* keep same vertical alignment as surrounding text */
+  margin: 0; /* do not change vertical spacing */
+  padding: 0;
+}
+
+/* In case on small screens you still want it centered, keep same behavior as footer-complaints */
+@media (max-width: 640px) {
+  .footer-image-right {
+    justify-content: center;
+  }
+}
