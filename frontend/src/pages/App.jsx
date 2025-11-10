@@ -7,6 +7,7 @@ import Register from './Auth/Register';
 import Profile from './Profile';
 import Empresas from './Empresas';
 import Estagios from './Estagios';
+import EstagioDetalhes from './EstagioDetalhes';
 import Candidaturas from './Candidaturas';
 import Footer from '../components/Footer';
 import '../styles/App.css'
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/perfil" element={<Profile />} />
           <Route path="/empresas" element={<Empresas />} />
           <Route path="/estagios" element={<Estagios />} />
+          <Route path="/estagios/:id" element={<EstagioDetalhes />} />
           <Route path="/candidaturas" element={<Candidaturas />} />
         </Routes>
         <Footer />
