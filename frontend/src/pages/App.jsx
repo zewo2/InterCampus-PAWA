@@ -12,6 +12,9 @@ import Candidaturas from './Candidaturas';
 import Fallback from './Fallback';
 import Footer from '../components/Footer';
 import '../styles/App.css'
+// Toast notifications
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   return (
@@ -31,6 +34,8 @@ const App = () => {
           <Route path="*" element={<Fallback />} />
         </Routes>
         <Footer />
+        {/* Global toast container for react-toastify */}
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
       </div>
     </Router>
   )

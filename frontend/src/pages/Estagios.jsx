@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -49,7 +50,7 @@ function Estagios() {
     
     // Check if user is a student
     if (userData.role !== 'Aluno') {
-      alert('Apenas alunos podem candidatar-se a estágios');
+      toast.error('Apenas alunos podem candidatar-se a estágios');
       return;
     }
 
@@ -73,7 +74,7 @@ function Estagios() {
         throw new Error(data.error || 'Erro ao submeter candidatura');
       }
 
-      alert('Candidatura submetida com sucesso!');
+      toast.success('Candidatura submetida com sucesso!');
       
       // Update the applicant count in the list
       setOfertas(prev => prev.map(o => 
@@ -85,7 +86,7 @@ function Estagios() {
       // Optionally navigate to details or candidaturas page
       navigate(`/estagios/${ofertaId}`);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || 'Erro ao submeter candidatura');
     } finally {
       setApplyingTo(null);
     }

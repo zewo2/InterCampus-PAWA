@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -97,7 +98,7 @@ function EstagioDetalhes() {
         total_candidaturas: (prev.total_candidaturas || 0) + 1
       }));
       
-      alert('Candidatura submetida com sucesso!');
+      toast.success('Candidatura submetida com sucesso!');
       // Optionally navigate to candidaturas page
       // navigate('/candidaturas');
     } catch (err) {
