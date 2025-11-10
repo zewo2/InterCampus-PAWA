@@ -38,7 +38,7 @@ const Header = () => {
     <header className="flex items-center justify-between max-w-[1300px] mx-auto py-4 px-10 bg-white shadow-sm">
       {/* Logo e Menu */}
       <div className="flex items-center gap-20">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Link to="/">
             <img src={logo} alt="brandlogo" className="h-12 w-auto object-contain"/>
           </Link>
