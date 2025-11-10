@@ -9,6 +9,7 @@ import Empresas from './Empresas';
 import Estagios from './Estagios';
 import EstagioDetalhes from './EstagioDetalhes';
 import Candidaturas from './Candidaturas';
+import Fallback from './Fallback';
 import Footer from '../components/Footer';
 import '../styles/App.css'
 
@@ -26,6 +27,8 @@ const App = () => {
           <Route path="/estagios" element={<Estagios />} />
           <Route path="/estagios/:id" element={<EstagioDetalhes />} />
           <Route path="/candidaturas" element={<Candidaturas />} />
+          {/* 404 Fallback - must be last */}
+          <Route path="*" element={<Fallback />} />
         </Routes>
         <Footer />
       </div>
