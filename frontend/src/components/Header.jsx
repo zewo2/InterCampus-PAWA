@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import logo from '../assets/brandlogo.png';
 
 const Header = () => {
@@ -27,10 +28,13 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
+    const userName = user?.nome;
     // Clear user data from localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    toast.info(`Sessão terminada. Até breve, ${userName || 'utilizador'}!`);
     setUser(null);
+    window.dispatchEvent(new Event('storage'));
     navigate('/');
   };
 
@@ -54,9 +58,7 @@ const Header = () => {
           <Link to="/candidaturas" className="text-black text-[17px] font-medium hover:text-blue-700 transition-colors no-underline">
             Candidaturas
           </Link>
-          <a href="#" className="text-black text-[17px] font-medium hover:text-blue-700 transition-colors no-underline">
-            Recursos
-          </a>
+
         </nav>
       </div>
 

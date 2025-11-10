@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -46,6 +47,7 @@ function Login() {
       // Trigger header update
       window.dispatchEvent(new Event('storage'));
 
+  toast.success(`Sessão iniciada com sucesso! Bem-vindo de volta, ${data.user?.nome || 'utilizador'}.`);
       // Redirect to home
       navigate('/');
     } catch (err) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -28,7 +29,8 @@ function Register() {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('As passwords não coincidem');
+      const mismatchMessage = 'As passwords não coincidem';
+      toast.error(mismatchMessage);
       return;
     }
 
@@ -61,10 +63,12 @@ function Register() {
       // Trigger header update
       window.dispatchEvent(new Event('storage'));
 
+      toast.success(`Conta criada com sucesso! Bem-vindo(a), ${data.user?.nome || formData.nome || 'utilizador(a)'}.`);
       // Redirect to home
       navigate('/');
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'Erro ao registar utilizador.');
     } finally {
       setLoading(false);
     }

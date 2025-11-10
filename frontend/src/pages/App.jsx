@@ -1,4 +1,5 @@
 import React from 'react';
+import { ToastContainer } from 'react-toastify';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from '../components/Header';
 import Home from './Home';
@@ -8,7 +9,9 @@ import Profile from './Profile';
 import Empresas from './Empresas';
 import Estagios from './Estagios';
 import Candidaturas from './Candidaturas';
+
 import Footer from '../components/Footer';
+import 'react-toastify/dist/ReactToastify.css';
 import '../styles/App.css'
 
 const App = () => {
@@ -24,8 +27,10 @@ const App = () => {
           <Route path="/empresas" element={<Empresas />} />
           <Route path="/estagios" element={<Estagios />} />
           <Route path="/candidaturas" element={<Candidaturas />} />
+     
         </Routes>
         <Footer />
+        <ToastContainer position="bottom-right" theme="colored" newestOnTop pauseOnFocusLoss={false} closeOnClick autoClose={4000} />
       </div>
     </Router>
   )
