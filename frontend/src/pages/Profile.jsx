@@ -116,6 +116,9 @@ function Profile() {
       reader.onloadend = () => {
         setProfilePicturePreview(reader.result);
       };
+      reader.onerror = () => {
+        setError('Erro ao carregar pré-visualização da imagem');
+      };
       reader.readAsDataURL(file);
     }
   };
