@@ -10,6 +10,8 @@ import Estagios from './Estagios';
 import Candidaturas from './Candidaturas';
 import Footer from '../components/Footer';
 import '../styles/App.css'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const App = () => {
   return (
@@ -26,6 +28,7 @@ const App = () => {
           <Route path="/candidaturas" element={<Candidaturas />} />
         </Routes>
         <Footer />
+        <ToastContainer position="bottom-right" theme="colored" newestOnTop pauseOnFocusLoss={false} closeOnClick autoClose={4000} />
       </div>
     </Router>
   )

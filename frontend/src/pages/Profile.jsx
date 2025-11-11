@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -55,6 +56,7 @@ function Profile() {
   }, [navigate]);
 
   const handleLogout = () => {
+    toast.info(`Sessão terminada. Até breve, ${user?.nome || 'utilizador'}!`);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.dispatchEvent(new Event('storage'));
