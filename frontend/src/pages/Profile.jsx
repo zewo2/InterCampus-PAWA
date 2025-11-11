@@ -96,12 +96,16 @@ function Profile() {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('A imagem deve ter no máximo 5MB');
+        setProfilePicture(null);
+        setProfilePicturePreview(null);
         return;
       }
 
       // Check file type
       if (!file.type.startsWith('image/')) {
         setError('Por favor selecione uma imagem válida');
+        setProfilePicture(null);
+        setProfilePicturePreview(null);
         return;
       }
 
