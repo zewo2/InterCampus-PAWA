@@ -66,7 +66,7 @@ function EstagioDetalhes() {
     
     // Check if user is a student
     if (userData.role !== 'Aluno') {
-      setApplicationError('Apenas alunos podem candidatar-se a estágios');
+      toast.error('Apenas alunos podem candidatar-se a estágios');
       return;
     }
 
