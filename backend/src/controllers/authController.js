@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../database/db');
+const fs = require('fs');
+const path = require('path');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
@@ -117,7 +119,7 @@ exports.login = async (req, res, next) => {
 exports.me = async (req, res, next) => {
   try {
     const [users] = await pool.query(
-      'SELECT id, nome, email, role FROM Utilizador WHERE id = ?',
+      'SELECT id, nome, email, role, profile_picture FROM Utilizador WHERE id = ?',
       [req.user.id]
     );
 
@@ -149,6 +151,75 @@ exports.recoverPassword = async (req, res, next) => {
     // TODO: Generate reset token and send email
     // For now, just return success
     res.json({ success: true, message: 'Link de recuperação enviado (funcionalidade em desenvolvimento)' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Update user profile
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { nome, email } = req.body;
+
+    if (!nome || !email) {
+      return res.status(400).json({ error: 'Nome e email são obrigatórios' });
+    }
+
+    // Check if email is already in use by another user
+    const [existing] = await pool.query(
+      'SELECT id FROM Utilizador WHERE email = ? AND id != ?',
+      [email, userId]
+    );
+
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'Email já está em uso' });
+    }
+
+    // Handle profile picture upload
+    let profilePicturePath = null;
+    if (req.file) {
+      // Delete old profile picture if exists
+      const [currentUser] = await pool.query(
+        'SELECT profile_picture FROM Utilizador WHERE id = ?',
+        [userId]
+      );
+      
+      if (currentUser[0]?.profile_picture) {
+        const oldPicturePath = path.join(__dirname, '../../', currentUser[0].profile_picture);
+        if (fs.existsSync(oldPicturePath)) {
+          fs.unlinkSync(oldPicturePath);
+        }
+      }
+
+      // Store relative path
+      profilePicturePath = `uploads/profile-pictures/${req.file.filename}`;
+    }
+
+    // Update user
+    if (profilePicturePath) {
+      await pool.query(
+        'UPDATE Utilizador SET nome = ?, email = ?, profile_picture = ? WHERE id = ?',
+        [nome, email, profilePicturePath, userId]
+      );
+    } else {
+      await pool.query(
+        'UPDATE Utilizador SET nome = ?, email = ? WHERE id = ?',
+        [nome, email, userId]
+      );
+    }
+
+    // Get updated user
+    const [users] = await pool.query(
+      'SELECT id, nome, email, role, profile_picture FROM Utilizador WHERE id = ?',
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Perfil atualizado com sucesso',
+      user: users[0]
+    });
   } catch (err) {
     next(err);
   }

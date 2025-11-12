@@ -54,11 +54,13 @@ Create or edit `.env.local`:
 
 ```
 VITE_API_URL=http://localhost:3000/api
+VITE_BACKEND_URL=http://localhost:3000
 ```
 
 Access in code:
 ```javascript
 const apiUrl = import.meta.env.VITE_API_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 ```
 
 ## Project Structure
@@ -78,7 +80,7 @@ frontend/
 │   │   │   └── Recovery.jsx
 │   │   ├── App.jsx         # Main app with routing
 │   │   ├── Home.jsx        # Homepage with stats & featured offers
-│   │   ├── Profile.jsx     # User profile page
+│   │   ├── Profile.jsx     # User profile page with picture upload
 │   │   ├── Empresas.jsx    # Companies list page
 │   │   ├── Estagios.jsx    # Internship offers list page
 │   │   ├── Candidaturas.jsx # User applications page
@@ -133,6 +135,29 @@ const response = await fetch(`${API_URL}/auth/login`, {
   body: JSON.stringify({ email, password })
 });
 const data = await response.json();
+
+// File upload with FormData (e.g., profile picture)
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const formData = new FormData();
+formData.append('nome', 'John Doe');
+formData.append('email', 'john@example.com');
+formData.append('profilePicture', fileObject); // File from input[type="file"]
+
+const response = await fetch(`${API_URL}/auth/update-profile`, {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`
+    // Don't set Content-Type for FormData - browser sets it automatically
+  },
+  body: formData
+});
+const data = await response.json();
+
+// Display uploaded image
+if (user.profile_picture) {
+  const imageUrl = `${BACKEND_URL}/${user.profile_picture}`;
+  // Use imageUrl in <img src={imageUrl} />
+}
 ```
 
 ## Routes

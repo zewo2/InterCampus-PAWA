@@ -9,7 +9,8 @@
     "create-tables": "node src/database/createtables.js",
     "seed-db": "node src/database/exampledata.js",
     "reset-db": "node src/database/resetdb.js && node src/database/exampledata.js",
-    "init-db": "npm run create-db && npm run create-tables && npm run seed-db"
+    "init-db": "npm run create-db && npm run create-tables && npm run seed-db",
+    "add-profile-pictures": "node src/database/addProfilePicture.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,6 +18,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
     "mysql2": "^3.15.3"
   },
   "devDependencies": {

@@ -3,15 +3,22 @@ const { pool } = require('../database/db');
 // Get all internship offers
 exports.getAll = async (req, res, next) => {
   try {
-    const { search, local, duracao } = req.query;
+    const { search, local, duracao, empresa } = req.query;
     
     let query = `
-      SELECT o.*, e.nome_empresa, e.morada
+      SELECT o.*, e.nome_empresa, e.morada,
+        (SELECT COUNT(*) FROM Candidatura c WHERE c.id_oferta = o.id_oferta) as total_candidaturas
       FROM OfertaEstagio o
       INNER JOIN Empresa e ON o.id_empresa = e.id_empresa
       WHERE e.validada = true
     `;
     const params = [];
+
+    // Filter by company ID if provided
+    if (empresa) {
+      query += ' AND o.id_empresa = ?';
+      params.push(parseInt(empresa));
+    }
 
     if (search) {
       query += ' AND (o.titulo LIKE ? OR o.descricao LIKE ? OR o.requisitos LIKE ?)';
@@ -43,7 +50,8 @@ exports.getById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const [ofertas] = await pool.query(`
-      SELECT o.*, e.nome_empresa, e.morada, e.NIF
+      SELECT o.*, e.nome_empresa, e.morada, e.NIF,
+        (SELECT COUNT(*) FROM Candidatura c WHERE c.id_oferta = o.id_oferta) as total_candidaturas
       FROM OfertaEstagio o
       INNER JOIN Empresa e ON o.id_empresa = e.id_empresa
       WHERE o.id_oferta = ?
