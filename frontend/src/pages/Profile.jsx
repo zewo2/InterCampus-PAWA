@@ -29,6 +29,18 @@ function Profile() {
   const [profilePicturePreview, setProfilePicturePreview] = useState(null);
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  
+  const roleConfig = {
+    Aluno: { color: 'blue', title: 'Estudante' },
+    Empresa: { color: 'green', title: 'Empresa' },
+    Professor: { color: 'purple', title: 'Professor' }
+  };
+  const currentRole = roleConfig[user?.role] || { color: 'gray', title: user?.role || 'Utilizador' };
+  const nextSteps = {
+    Aluno: ['Complete o seu perfil', 'Candidate-se às vagas que interessam'],
+    Empresa: ['Complete o perfil da sua empresa', 'Publique ofertas de estágio'],
+    Professor: ['Acompanhe os seus alunos orientados', 'Avalie estágios em curso']
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
