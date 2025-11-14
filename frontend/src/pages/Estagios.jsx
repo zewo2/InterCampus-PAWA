@@ -4,22 +4,86 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
+// Map category names to search keywords
+const categoryKeywords = {
+  'Design & UX': 'figma adobe photoshop illustrator xd sketch ui ux design',
+  'Frontend Development': 'react vue angular frontend html css tailwind next.js javascript typescript',
+  'Backend Development': 'java spring node.js backend api microserviços express django flask python',
+  'Mobile Development': 'flutter react native ios android mobile swift kotlin',
+  'Data Science & AI': 'machine learning ml tensorflow data science python power bi tableau analytics',
+  'Cloud & DevOps': 'aws azure cloud devops kubernetes docker terraform ci/cd',
+  'Cibersegurança': 'security cibersegurança pentesting network security siem',
+  'QA & Testing': 'qa testing selenium cypress jest automation test',
+  'Marketing & Comunicação': 'marketing seo social media comunicação google analytics',
+  'Gestão & Produto': 'scrum agile product business gestão jira',
+  'Tecnologia': 'developer engineer desenvolvimento programming'
+};
+
 function Estagios() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const empresaId = searchParams.get('empresa');
   
   const [ofertas, setOfertas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [applyingTo, setApplyingTo] = useState(null);
+  
+  // Filter states
+  const [query, setQuery] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState(searchParams.get('local') || '');
+  const [selectedArea, setSelectedArea] = useState('');
+  const [locations, setLocations] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  // Fetch locations and categories for filters
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/home`);
+        if (response.ok) {
+          const data = await response.json();
+          setLocations(data.data?.locations || []);
+          setCategories(data.data?.categories || []);
+          
+          // Check if search param matches a category - if so, set it as area filter
+          const searchParam = searchParams.get('search');
+          if (searchParam) {
+            const matchingCategory = data.data?.categories?.find(
+              cat => cat.categoria.toLowerCase() === searchParam.toLowerCase()
+            );
+            if (matchingCategory) {
+              setSelectedArea(matchingCategory.categoria);
+            } else {
+              setQuery(searchParam);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching filter data:', err);
+      }
+    };
+    fetchFilterData();
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchOfertas = async () => {
+      setLoading(true);
       try {
-        const url = empresaId 
-          ? `${API_URL}/ofertas?empresa=${empresaId}`
-          : `${API_URL}/ofertas`;
+        // Build query string
+        const params = new URLSearchParams();
+        if (empresaId) params.append('empresa', empresaId);
+        
+        // If selectedArea is set, use category keywords; otherwise use query
+        let searchTerm = query;
+        if (selectedArea) {
+          searchTerm = categoryKeywords[selectedArea] || selectedArea;
+        }
+        
+        if (searchTerm) params.append('search', searchTerm);
+        if (selectedLocation) params.append('local', selectedLocation);
+        
+        const url = `${API_URL}/ofertas${params.toString() ? '?' + params.toString() : ''}`;
         
         const response = await fetch(url);
         if (!response.ok) {
@@ -35,7 +99,28 @@ function Estagios() {
     };
 
     fetchOfertas();
-  }, [empresaId]);
+  }, [empresaId, query, selectedLocation, selectedArea]);
+
+  const handleSearch = () => {
+    // Filters will auto-trigger via useEffect dependencies
+    // Just update URL for sharing
+    const params = new URLSearchParams();
+    const searchTerm = selectedArea || query;
+    if (searchTerm) params.append('search', searchTerm);
+    if (selectedLocation) params.append('local', selectedLocation);
+    if (empresaId) params.append('empresa', empresaId);
+    
+    setSearchParams(params);
+  };
+
+  const handleClearFilters = () => {
+    setQuery('');
+    setSelectedLocation('');
+    setSelectedArea('');
+    const params = new URLSearchParams();
+    if (empresaId) params.append('empresa', empresaId);
+    setSearchParams(params);
+  };
 
   const handleCandidatar = async (ofertaId) => {
     const token = localStorage.getItem('token');
@@ -164,8 +249,108 @@ function Estagios() {
         </div>
       </div>
 
+      {/* Search Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-30 mb-8">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 border-4 border-white/50 hover:border-blue-200 transition-all">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search Input */}
+            <div className="flex-1 relative group">
+              <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <svg className="w-6 h-6 text-gray-500 group-focus-within:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Que tipo de estágio procuras?"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } }}
+                className="w-full pl-16 pr-6 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 placeholder:text-gray-500 shadow-inner border-2 border-transparent focus:border-blue-300 transition-all"
+              />
+            </div>
+
+            {/* Location Select */}
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg className="w-6 h-6 text-gray-500 group-focus-within:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <select 
+                value={selectedLocation} 
+                onChange={(e) => setSelectedLocation(e.target.value)} 
+                className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all"
+              >
+                <option value="">Localização</option>
+                {locations.map((loc, index) => (
+                  <option key={index} value={loc}>{loc}</option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Area Select */}
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg className="w-6 h-6 text-gray-500 group-focus-within:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <select 
+                value={selectedArea} 
+                onChange={(e) => setSelectedArea(e.target.value)} 
+                className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all"
+              >
+                <option value="">Área</option>
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat.categoria}>{cat.categoria}</option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Search Button */}
+            <button 
+              type="button" 
+              onClick={handleSearch} 
+              className="relative overflow-hidden bg-blue-600 text-white px-8 py-5 rounded-2xl font-black text-lg transition-all shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 hover:bg-blue-700 group"
+            >
+              <span className="relative z-10 flex items-center justify-center">
+                <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+            </button>
+
+            {/* Clear Filters Button */}
+            {(query || selectedLocation || selectedArea) && (
+              <button 
+                type="button" 
+                onClick={handleClearFilters} 
+                className="bg-gray-200 text-gray-700 px-6 py-5 rounded-2xl font-semibold hover:bg-gray-300 transition-all shadow-md hover:shadow-lg"
+                title="Limpar filtros"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-8 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-20">
         {ofertas.length === 0 ? (
           <div className="text-center py-24">
             <div className="inline-flex items-center justify-center w-24 h-24 bg-linear-to-br from-gray-100 to-gray-200 rounded-3xl mb-8 shadow-lg">
