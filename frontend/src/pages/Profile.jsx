@@ -372,9 +372,25 @@ function Profile() {
                 )}
               </div>
               <h1 className="text-2xl font-bold text-gray-800 mt-4">{user?.nome}</h1>
-              <span className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-${currentRole.color}-100 text-${currentRole.color}-800`}>
-                {currentRole.title}
-              </span>
+              {/*
+                Use a static mapping for Tailwind color classes to ensure JIT compilation.
+              */}
+              {(() => {
+                const colorClasses = {
+                  blue: 'bg-blue-100 text-blue-800',
+                  green: 'bg-green-100 text-green-800',
+                  purple: 'bg-purple-100 text-purple-800',
+                  red: 'bg-red-100 text-red-800',
+                  yellow: 'bg-yellow-100 text-yellow-800',
+                  gray: 'bg-gray-100 text-gray-800',
+                };
+                const colorClass = colorClasses[currentRole?.color] || 'bg-gray-100 text-gray-800';
+                return (
+                  <span className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
+                    {currentRole.title}
+                  </span>
+                );
+              })()}
               <p className="text-gray-500 text-sm mt-2">{user?.email}</p>
 
               <div className="mt-6 space-y-3">
