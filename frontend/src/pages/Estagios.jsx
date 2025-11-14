@@ -68,6 +68,15 @@ function Estagios() {
         })
       });
 
+      // If token is invalid/expired (401), clear storage and redirect to login
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.dispatchEvent(new Event('userUpdated'));
+        navigate('/login');
+        return;
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
