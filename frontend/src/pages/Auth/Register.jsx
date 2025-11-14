@@ -61,7 +61,7 @@ function Register() {
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // Trigger header update
-      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('userUpdated'));
 
       toast.success(`Conta criada com sucesso! Bem-vindo(a), ${data.user?.nome || formData.nome || 'utilizador(a)'}.`);
       // Redirect to home

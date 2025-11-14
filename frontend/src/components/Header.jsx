@@ -16,16 +16,16 @@ const Header = () => {
       setUser(JSON.parse(storedUser));
     }
 
-    // Listen for storage changes (login/logout)
+    // Listen for user updates (login/logout/profile changes)
     const handleStorageChange = () => {
       const updatedUser = localStorage.getItem('user');
       setUser(updatedUser ? JSON.parse(updatedUser) : null);
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('userUpdated', handleStorageChange);
     
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userUpdated', handleStorageChange);
     };
   }, []);
 

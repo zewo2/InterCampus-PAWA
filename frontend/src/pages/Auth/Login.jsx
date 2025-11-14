@@ -45,7 +45,7 @@ function Login() {
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // Trigger header update
-      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('userUpdated'));
 
       toast.info('Sessão iniciada com sucesso! Bem-vindo de volta.');
       // Redirect to home

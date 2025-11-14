@@ -9,6 +9,7 @@ Express.js REST API server with MySQL database integration.
 - **bcryptjs** - Password hashing
 - **jsonwebtoken** - JWT authentication
 - **cors** - CORS middleware
+- **multer** - File upload handling
 - **dotenv** - Environment variable management
 - **nodemon** - Development auto-restart
 
@@ -60,6 +61,9 @@ npm run seed-db        # Populates with example data
 
 # Reset database (truncate and reseed)
 npm run reset-db
+
+# Add profile picture support (migration)
+npm run add-profile-pictures  # Adds profile_picture column and creates uploads directory
 ```
 
 ### Start Development Server
@@ -85,6 +89,7 @@ npm start
 - `npm run create-tables` - Create all database tables
 - `npm run seed-db` - Populate database with example data
 - `npm run reset-db` - Reset database (truncate all tables and reseed)
+- `npm run add-profile-pictures` - Add profile_picture column to database and create uploads directory
 
 ## Project Structure
 
@@ -120,6 +125,7 @@ backend/
 │   │   └── views.js
 │   ├── middlewares/          # Custom middleware
 │   │   ├── authMiddleware.js # JWT verification & authorization
+│   │   ├── uploadMiddleware.js # File upload handling (multer)
 │   │   └── errorHandler.js
 │   ├── models/               # Data models
 │   │   └── userModel.js
@@ -128,7 +134,10 @@ backend/
 │       ├── createdatabase.js
 │       ├── createtables.js
 │       ├── exampledata.js
-│       └── resetdb.js
+│       ├── resetdb.js
+│       └── addProfilePicture.js  # Migration to add profile pictures
+├── uploads/                  # User uploaded files (gitignored)
+│   └── profile-pictures/     # Profile picture storage
 ├── .env                      # Environment variables (gitignored)
 ├── .env.example              # Environment template
 ├── .gitignore
@@ -139,10 +148,16 @@ backend/
 
 ### Authentication
 ```
-POST   /api/auth/register    # Register new user
-POST   /api/auth/login       # Login user
-GET    /api/auth/me          # Get current user (protected)
-POST   /api/auth/recover     # Password recovery
+POST   /api/auth/register        # Register new user
+POST   /api/auth/login           # Login user
+GET    /api/auth/me              # Get current user (protected)
+PUT    /api/auth/update-profile  # Update user profile with optional picture upload (protected, multipart/form-data)
+POST   /api/auth/recover         # Password recovery
+```
+
+### Static Files
+```
+GET    /uploads/profile-pictures/:filename  # Access uploaded profile pictures
 ```
 
 ### Home
@@ -249,7 +264,7 @@ The app uses `mysql2/promise` for async/await database operations.
 ### Database Schema
 
 The database includes the following tables:
-- **Utilizador** - User accounts (Empresa, Aluno, Professor, Gestor)
+- **Utilizador** - User accounts (Empresa, Aluno, Professor, Gestor) with profile_picture field
 - **Empresa** - Company profiles
 - **OrientadorEmpresa** - Company supervisors
 - **Aluno** - Student profiles
@@ -431,12 +446,13 @@ curl http://localhost:3000/api/health
 - [x] Add role-based authorization
 - [x] Add CORS configuration for frontend
 - [x] Add database scripts (create, seed, reset)
+- [x] Add file upload support (multer) for profile pictures
 - [ ] Add input validation (express-validator, joi)
 - [ ] Add API documentation (Swagger/OpenAPI)
 - [ ] Add unit tests (Jest, Mocha)
 - [ ] Add logging (winston, morgan)
 - [ ] Add rate limiting (express-rate-limit)
-- [ ] Add file upload support (multer) for CVs and documents
+- [ ] Add file upload support for CVs and documents
 
 ## Learn More
 
