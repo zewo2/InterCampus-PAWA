@@ -9,12 +9,12 @@ import Empresas from './Empresas';
 import Estagios from './Estagios';
 import EstagioDetalhes from './EstagioDetalhes';
 import Candidaturas from './Candidaturas';
+import Contacts from './Contacts';
 import Fallback from './Fallback';
 import Footer from '../components/Footer';
 import '../styles/App.css'
-// Toast notifications
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const App = () => {
   return (
@@ -30,12 +30,11 @@ const App = () => {
           <Route path="/estagios" element={<Estagios />} />
           <Route path="/estagios/:id" element={<EstagioDetalhes />} />
           <Route path="/candidaturas" element={<Candidaturas />} />
-          {/* 404 Fallback - must be last */}
+          <Route path="/contactos" element={<Contacts />} />
           <Route path="*" element={<Fallback />} />
         </Routes>
         <Footer />
-        {/* Global toast container for react-toastify */}
-        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+        <ToastContainer position="bottom-right" theme="colored" newestOnTop pauseOnFocusLoss={false} closeOnClick autoClose={4000} />
       </div>
     </Router>
   )
