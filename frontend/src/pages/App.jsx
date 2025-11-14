@@ -10,6 +10,7 @@ import Estagios from './Estagios';
 import EstagioDetalhes from './EstagioDestalhes';
 import Candidaturas from './Candidaturas';
 import Contacts from './Contacts';
+import Fallback from './Fallback';
 import Footer from '../components/Footer';
 import '../styles/App.css'
 import 'react-toastify/dist/ReactToastify.css';
