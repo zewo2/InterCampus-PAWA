@@ -135,7 +135,135 @@ exports.me = async (req, res, next) => {
   }
 };
 
-// Password recovery (placeholder - would send email in production)
+// Password recovery - Request reset link
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email é obrigatório' });
+    }
+
+    const [users] = await pool.query('SELECT id, nome FROM Utilizador WHERE email = ?', [email]);
+    
+    if (users.length === 0) {
+      // Don't reveal if email exists for security
+      return res.json({ 
+        success: true, 
+        message: 'Se o email existir, será enviado um link de recuperação' 
+      });
+    }
+
+    const user = users[0];
+    
+    // Generate reset token (valid for 1 hour)
+    const resetToken = jwt.sign(
+      { id: user.id, email, type: 'password-reset' },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    // In production, send email with reset link
+    // const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    // await sendEmail(email, 'Password Reset', resetLink);
+
+    console.log(`Password reset requested for: ${email}`);
+    console.log(`Reset token: ${resetToken}`);
+    console.log(`Reset link: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`);
+
+    res.json({ 
+      success: true, 
+      message: 'Link de recuperação enviado (verifique o console do servidor em desenvolvimento)',
+      // In development, return token for testing
+      ...(process.env.NODE_ENV === 'development' && { resetToken })
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Validate reset token
+exports.validateResetToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: 'Token é obrigatório' });
+    }
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      
+      if (decoded.type !== 'password-reset') {
+        return res.status(400).json({ error: 'Token inválido' });
+      }
+
+      // Check if user still exists
+      const [users] = await pool.query('SELECT id FROM Utilizador WHERE id = ?', [decoded.id]);
+      
+      if (users.length === 0) {
+        return res.status(400).json({ error: 'Utilizador não encontrado' });
+      }
+
+      res.json({ success: true, valid: true });
+    } catch (jwtError) {
+      if (jwtError.name === 'TokenExpiredError') {
+        return res.status(400).json({ error: 'Link expirado. Solicite um novo link de recuperação.' });
+      }
+      return res.status(400).json({ error: 'Token inválido' });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Reset password with token
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ error: 'Token e palavra-passe são obrigatórios' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'A palavra-passe deve ter pelo menos 8 caracteres' });
+    }
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      
+      if (decoded.type !== 'password-reset') {
+        return res.status(400).json({ error: 'Token inválido' });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Update password
+      await pool.query(
+        'UPDATE Utilizador SET password = ? WHERE id = ?',
+        [hashedPassword, decoded.id]
+      );
+
+      console.log(`Password reset successful for user ID: ${decoded.id}`);
+
+      res.json({ 
+        success: true, 
+        message: 'Palavra-passe redefinida com sucesso' 
+      });
+    } catch (jwtError) {
+      if (jwtError.name === 'TokenExpiredError') {
+        return res.status(400).json({ error: 'Link expirado. Solicite um novo link de recuperação.' });
+      }
+      return res.status(400).json({ error: 'Token inválido' });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Old recover password endpoint (deprecated - kept for backwards compatibility)
 exports.recoverPassword = async (req, res, next) => {
   try {
     const { email } = req.body;

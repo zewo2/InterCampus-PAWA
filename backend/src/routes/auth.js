@@ -8,6 +8,9 @@ const { handleUploadError } = require('../middlewares/uploadMiddleware');
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/recover-password', authController.recoverPassword);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/validate-reset-token', authController.validateResetToken);
+router.post('/reset-password', authController.resetPassword);
 
 // Protected routes
 router.get('/me', authenticate, authController.me);

@@ -4,6 +4,8 @@ import Header from '../components/Header';
 import Home from './Home';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
+import ForgotPassword from './Auth/ForgotPassword';
+import ResetPassword from './Auth/ResetPassword';
 import Profile from './Profile';
 import Empresas from './Empresas';
 import Estagios from './Estagios';
@@ -138,6 +140,8 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/empresas" element={<Empresas />} />
         <Route path="/estagios" element={<Estagios />} />
