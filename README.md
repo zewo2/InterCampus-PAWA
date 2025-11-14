@@ -6,14 +6,36 @@ Full-stack internship management platform built with Express.js (backend) and Re
 
 ## Features
 
+### Core Functionality
 - 🔐 JWT-based authentication with role-based authorization
 - 👥 Multiple user types: Students (Aluno), Companies (Empresa), Professors (Professor), Managers (Gestor)
 - 🏢 Company profiles and validation system
-- 📝 Internship offer management
+- 📝 Internship offer management with advanced search and filtering
 - 📋 Application tracking and status updates
-- ⭐ Internship evaluations
-- 📊 Dashboard with real-time statistics
-- 🔍 Search and filter internship opportunities
+- ⭐ Internship evaluations and progress tracking
+- 🔍 Smart search with keyword expansion and location filtering
+
+### User Experience
+- 🎨 Modern, responsive UI with Tailwind CSS 4
+- 🔔 Toast notifications with react-toastify
+- 📊 Role-specific dashboards (Professor, Empresa, Gestor)
+- 🖼️ Profile picture upload and management
+- 🔄 Real-time data updates and statistics
+- 📱 Mobile-friendly design
+
+### Administration & Management
+- 👨‍🏫 Professor dashboard for student supervision
+- 🏢 Company dashboard for offer and application management
+- 🛡️ Manager dashboard with validation controls and analytics
+- 📈 Analytics and reporting features
+- 📄 Document management for internship processes
+
+### Legal & Security
+- 📜 Terms and Conditions page
+- 🔒 Privacy Policy (GDPR compliant)
+- 🛡️ Secure password hashing (bcryptjs)
+- 🔑 Token-based authentication with expiration handling
+- 🚫 Role-based access control (RBAC)
 
 ## Project Structure
 
@@ -228,6 +250,28 @@ Run `npm run init-db` in the backend folder to set up everything automatically.
 - Use `.env.example` files as templates
 - CORS is configured to allow frontend requests from `http://localhost:5173`
 - All passwords are hashed using bcryptjs before storage
+
+## Default Login Credentials
+
+After running `npm run init-db` in the backend, you can login with any of these test accounts:
+
+### Students (Aluno)
+- Email: `andre.gomes@my.istec.pt`
+- Password: `InterCampus123!`
+
+### Companies (Empresa)
+- Email: `talento@farfetch.com`
+- Password: `InterCampus123!`
+
+### Professors (Professor)
+- Email: `carolina.mendes@my.istec.pt`
+- Password: `InterCampus123!`
+
+### Managers (Gestor)
+- Email: `gestor.01@istec.pt`
+- Password: `InterCampus123!`
+
+**Note:** All seeded accounts use the same default password: `InterCampus123!`
 
 ## Troubleshooting
 

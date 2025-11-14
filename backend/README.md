@@ -124,9 +124,10 @@ backend/
 │   │   ├── home.js
 │   │   └── views.js
 │   ├── middlewares/          # Custom middleware
-│   │   ├── authMiddleware.js # JWT verification & authorization
-│   │   ├── uploadMiddleware.js # File upload handling (multer)
-│   │   └── errorHandler.js
+│   │   ├── authMiddleware.js        # JWT verification & authorization
+│   │   ├── uploadMiddleware.js      # File upload handling with extension whitelist
+│   │   ├── documentUploadMiddleware.js # Document upload middleware
+│   │   └── errorHandler.js          # Global error handler
 │   ├── models/               # Data models
 │   │   └── userModel.js
 │   └── database/             # Database scripts
@@ -149,10 +150,10 @@ backend/
 ### Authentication
 ```
 POST   /api/auth/register        # Register new user
-POST   /api/auth/login           # Login user
-GET    /api/auth/me              # Get current user (protected)
+POST   /api/auth/login           # Login user (returns JWT token and user object)
+GET    /api/auth/me              # Get current user with profile picture (protected)
 PUT    /api/auth/update-profile  # Update user profile with optional picture upload (protected, multipart/form-data)
-POST   /api/auth/recover         # Password recovery
+POST   /api/auth/recover-password # Password recovery (placeholder)
 ```
 
 ### Static Files

@@ -7,8 +7,38 @@ React + Vite frontend application with Tailwind CSS.
 - **React 19** - UI library
 - **Vite 7** - Fast build tool with HMR
 - **Tailwind CSS 4** - Utility-first CSS framework
-- **React Router DOM** - Client-side routing
+- **React Router DOM** - Client-side routing with nested routes
+- **react-toastify** - Toast notifications for user feedback
 - **ESLint** - Code linting
+
+## Key Features
+
+### User Interface
+- Responsive design with Tailwind CSS 4
+- Modern glassmorphism effects and gradients
+- Toast notifications for all user actions
+- Loading states and error handling
+- Profile picture upload and display
+
+### Navigation
+- Conditional Header/Footer rendering (hidden in dashboards)
+- Dashboard button in header for authenticated users with roles
+- "Return to Website" button in all dashboards
+- Role-based route protection with RequireRole component
+
+### Data Management
+- Dynamic data fetching from backend API
+- Real-time search and filtering (location, category, keywords)
+- Keyword-based OR search for internship offers
+- Category detection from internship requirements
+- Application status tracking
+
+### Authentication & Authorization
+- JWT token management
+- LocalStorage persistence with userUpdated events
+- 401 error handling with automatic logout
+- Role-based redirects after login
+- Protected routes with authentication checks
 
 ## Getting Started
 
@@ -71,20 +101,44 @@ frontend/
 ├── src/
 │   ├── assets/       # Images, fonts, brand assets
 │   ├── components/   # Reusable React components
-│   │   ├── Header.jsx
-│   │   └── Footer.jsx
+│   │   ├── Header.jsx    # Navigation header with dashboard button
+│   │   └── Footer.jsx    # Footer with legal links
 │   ├── pages/        # Page components
 │   │   ├── Auth/     # Authentication pages
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   └── Recovery.jsx
-│   │   ├── App.jsx         # Main app with routing
-│   │   ├── Home.jsx        # Homepage with stats & featured offers
-│   │   ├── Profile.jsx     # User profile page with picture upload
-│   │   ├── Empresas.jsx    # Companies list page
-│   │   ├── Estagios.jsx    # Internship offers list page
-│   │   ├── Candidaturas.jsx # User applications page
-│   │   └── Contacts.jsx
+│   │   │   ├── Login.jsx      # Login with role-based redirect
+│   │   │   ├── Register.jsx   # User registration
+│   │   │   └── Recovery.jsx   # Password recovery
+│   │   ├── professor/         # Professor dashboard pages
+│   │   │   ├── ProfessorLayout.jsx
+│   │   │   ├── DashboardProfessor.jsx
+│   │   │   ├── ProfessorStudents.jsx
+│   │   │   ├── ProfessorInternships.jsx
+│   │   │   └── ProfessorDocuments.jsx
+│   │   ├── empresa/           # Company dashboard pages
+│   │   │   ├── EmpresaLayout.jsx
+│   │   │   ├── EmpresaDashboard.jsx
+│   │   │   ├── EmpresaPerfil.jsx
+│   │   │   ├── EmpresaOfertas.jsx
+│   │   │   └── EmpresaCandidaturas.jsx
+│   │   ├── gestor/            # Manager dashboard pages
+│   │   │   ├── GestorLayout.jsx
+│   │   │   ├── GestorDashboard.jsx
+│   │   │   ├── GestorEmpresasPendentes.jsx
+│   │   │   ├── GestorProcessos.jsx
+│   │   │   ├── GestorOrientadores.jsx
+│   │   │   ├── GestorRelatorios.jsx
+│   │   │   └── GestorLogs.jsx
+│   │   ├── App.jsx              # Main app with routing and RequireRole
+│   │   ├── Home.jsx             # Homepage with dynamic data
+│   │   ├── Profile.jsx          # User profile with picture upload
+│   │   ├── Empresas.jsx         # Companies list
+│   │   ├── Estagios.jsx         # Internship offers with filters
+│   │   ├── EstagioDetalhes.jsx  # Internship details and application
+│   │   ├── Candidaturas.jsx     # User applications
+│   │   ├── Contacts.jsx         # Contact page
+│   │   ├── Termos.jsx           # Terms and Conditions
+│   │   ├── Privacidade.jsx      # Privacy Policy
+│   │   └── Fallback.jsx         # 404 page
 │   ├── images/       # Image assets
 │   ├── styles/       # CSS files
 │   │   └── App.css
@@ -162,13 +216,40 @@ if (user.profile_picture) {
 
 ## Routes
 
-- `/` - Home page with stats and featured internships
-- `/login` - Login page
+### Public Routes
+- `/` - Home page with stats, featured internships, and category cards
+- `/login` - Login page with role-based redirect
 - `/register` - Registration page
-- `/perfil` - User profile (protected)
-- `/empresas` - Companies list
-- `/estagios` - Internship offers list
-- `/candidaturas` - User applications (protected)
+- `/empresas` - Companies list with validation status
+- `/estagios` - Internship offers list with advanced filters
+- `/estagios/:id` - Internship details with application functionality
+- `/contactos` - Contact page
+- `/termos` - Terms and Conditions page
+- `/privacidade` - Privacy Policy page (GDPR compliant)
+
+### Protected Routes (Require Authentication)
+- `/perfil` - User profile with picture upload
+- `/candidaturas` - User applications list
+
+### Professor Dashboard (Role: Professor)
+- `/professor/dashboard` - Overview and statistics
+- `/professor/alunos` - Supervised students
+- `/professor/estagios` - Active internships
+- `/professor/documentos` - Document management
+
+### Company Dashboard (Role: Empresa)
+- `/empresa/dashboard` - Company overview
+- `/empresa/perfil` - Company profile and validation status
+- `/empresa/ofertas` - Manage job offers
+- `/empresa/candidaturas` - Review applications
+
+### Manager Dashboard (Role: Gestor)
+- `/gestor/dashboard` - System-wide statistics
+- `/gestor/empresas` - Company validation queue
+- `/gestor/processos` - Application and internship management
+- `/gestor/orientadores` - Assign and manage supervisors
+- `/gestor/relatorios` - Reports and analytics
+- `/gestor/logs` - System activity logs
 
 ## Authentication
 
