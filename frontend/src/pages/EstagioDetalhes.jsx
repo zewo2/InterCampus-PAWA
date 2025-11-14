@@ -14,6 +14,7 @@ function EstagioDetalhes() {
   const [applying, setApplying] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
   const [applicationError, setApplicationError] = useState('');
+  const [applicationCheckWarning, setApplicationCheckWarning] = useState('');
 
   useEffect(() => {
     const fetchOferta = async () => {
@@ -34,6 +35,13 @@ function EstagioDetalhes() {
                 'Authorization': `Bearer ${token}`
               }
             });
+            
+            // If token expired, silently skip the check (user can still see the apply button)
+            if (candidaturasResponse.status === 401) {
+              setApplicationCheckWarning('Sessão expirada. Por favor, faça login novamente para verificar se já se candidatou.');
+              return;
+            }
+            
             if (candidaturasResponse.ok) {
               const candidaturasData = await candidaturasResponse.json();
               const applied = candidaturasData.data.some(c => c.id_oferta === parseInt(id));
@@ -41,6 +49,7 @@ function EstagioDetalhes() {
             }
           } catch (err) {
             console.error('Error checking applications:', err);
+            setApplicationCheckWarning('Não foi possível verificar se já se candidatou a esta vaga.');
           }
         }
       } catch (err) {
@@ -84,6 +93,15 @@ function EstagioDetalhes() {
           id_oferta: parseInt(id)
         })
       });
+
+      // If token is invalid/expired (401), clear storage and redirect to login
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.dispatchEvent(new Event('userUpdated'));
+        navigate('/login');
+        return;
+      }
 
       const data = await response.json();
 
@@ -144,19 +162,39 @@ function EstagioDetalhes() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
+        
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <button 
             onClick={() => navigate('/estagios')}
-            className="flex items-center text-blue-100 hover:text-white mb-6 transition-colors"
+            className="flex items-center text-blue-100 hover:text-white mb-8 transition-colors group"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 mr-3 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Voltar às ofertas
           </button>
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">{oferta.titulo}</h1>
-          <p className="text-2xl text-blue-100 font-semibold">{oferta.nome_empresa}</p>
+          
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+              {oferta.titulo}
+            </h1>
+            <div className="w-16 h-1.5 bg-gradient-to-r from-blue-300 to-indigo-300 mx-auto mb-6 rounded-full"></div>
+            <p className="text-2xl text-blue-100 font-semibold mb-6">{oferta.nome_empresa}</p>
+            
+            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
+              <svg className="w-5 h-5 mr-2 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span className="text-blue-100 font-semibold">
+                {oferta.total_candidaturas || 0} candidatura{oferta.total_candidaturas !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -302,6 +340,15 @@ function EstagioDetalhes() {
               </div>
 
               <div className="mt-6 pt-6 border-t border-gray-200">
+                {applicationCheckWarning && (
+                  <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg text-sm flex items-start">
+                    <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>{applicationCheckWarning}</span>
+                  </div>
+                )}
+
                 {applicationError && (
                   <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
                     {applicationError}

@@ -25,12 +25,22 @@ const storage = multer.diskStorage({
 // File filter - only accept images
 const fileFilter = (req, file, cb) => {
   const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-  
-  if (allowedMimes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
+  // First check MIME type
+  if (!allowedMimes.includes(file.mimetype)) {
     cb(new Error('Tipo de arquivo inválido. Apenas imagens são permitidas (JPEG, PNG, GIF, WebP).'), false);
+    return;
   }
+
+  // Additional defense-in-depth: check file extension from original filename
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (!allowedExtensions.includes(ext)) {
+    cb(new Error('Extensão de arquivo não permitida.'), false);
+    return;
+  }
+
+  // Passed both MIME and extension checks
+  cb(null, true);
 };
 
 // Create multer instance

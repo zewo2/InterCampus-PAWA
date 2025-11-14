@@ -9,6 +9,7 @@ import Empresas from './Empresas';
 import Estagios from './Estagios';
 import EstagioDetalhes from './EstagioDetalhes';
 import Candidaturas from './Candidaturas';
+import Contacts from './Contacts';
 import Fallback from './Fallback';
 import Footer from '../components/Footer';
 import ProfessorLayout from './professor/ProfessorLayout';
@@ -29,9 +30,8 @@ import GestorOrientadores from './gestor/GestorOrientadores';
 import GestorRelatorios from './gestor/GestorRelatorios';
 import GestorLogs from './gestor/GestorLogs';
 import '../styles/App.css'
-// Toast notifications
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -57,7 +57,7 @@ const RequireRole = ({ allowedRoles, children }) => {
     let storedUser;
     try {
       storedUser = JSON.parse(storedUserRaw);
-    } catch (err) {
+    } catch {
       storedUser = null;
     }
 
@@ -79,7 +79,7 @@ const RequireRole = ({ allowedRoles, children }) => {
           if (response.status === 401) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new Event('userUpdated'));
           }
           throw new Error('Não autorizado');
         }
@@ -91,7 +91,7 @@ const RequireRole = ({ allowedRoles, children }) => {
         if (isMounted) {
           setState({ checking: false, authorized });
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
           setState({ checking: false, authorized: false });
         }
@@ -103,7 +103,7 @@ const RequireRole = ({ allowedRoles, children }) => {
     return () => {
       isMounted = false;
     };
-  }, [rolesSignature]);
+  }, [rolesSignature, allowedRoles]);
 
   if (state.checking) {
     return (
@@ -140,6 +140,7 @@ const AppRoutes = () => {
         <Route path="/estagios" element={<Estagios />} />
         <Route path="/estagios/:id" element={<EstagioDetalhes />} />
         <Route path="/candidaturas" element={<Candidaturas />} />
+        <Route path="/contactos" element={<Contacts />} />
 
         <Route
           path="/professor/*"
@@ -199,15 +200,12 @@ const AppRoutes = () => {
 
       {/* Global toast container for react-toastify */}
       <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
+        position="bottom-right"
+        theme="colored"
+        newestOnTop
+        pauseOnFocusLoss={false}
         closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
+        autoClose={4000}
       />
     </>
   );
