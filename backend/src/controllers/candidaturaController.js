@@ -211,7 +211,7 @@ exports.updateStatus = async (req, res, next) => {
     const { id } = req.params;
     const { estado } = req.body;
 
-    const validStates = ['Pendente', 'Aceite', 'Recusado'];
+    const validStates = ['Pendente', 'Aceite', 'Recusado', 'Anulada'];
     if (!validStates.includes(estado)) {
       return res.status(400).json({ error: 'Estado inválido' });
     }
@@ -219,6 +219,22 @@ exports.updateStatus = async (req, res, next) => {
     const [existing] = await pool.query('SELECT id_candidatura FROM Candidatura WHERE id_candidatura = ?', [id]);
     if (existing.length === 0) {
       return res.status(404).json({ error: 'Candidatura não encontrada' });
+    }
+
+    if (estado === 'Anulada') {
+      await pool.query('UPDATE Candidatura SET estado = ? WHERE id_candidatura = ?', ['Pendente', id]);
+
+      await pool.query('DELETE FROM Estagio WHERE id_candidatura = ?', [id]);
+
+      await pool.query(
+        `UPDATE Aluno a
+         INNER JOIN Candidatura c ON a.id_aluno = c.id_aluno
+         SET a.estagio_status = false
+         WHERE c.id_candidatura = ?`,
+        [id]
+      );
+
+      return res.json({ success: true, message: 'Candidatura anulada com sucesso' });
     }
 
     await pool.query('UPDATE Candidatura SET estado = ? WHERE id_candidatura = ?', [estado, id]);

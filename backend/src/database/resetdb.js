@@ -21,6 +21,7 @@ async function resetDatabase() {
     // Truncate all tables in reverse order of dependencies
     const tables = [
       'Avaliacao',
+      'DocumentoEstagio',
       'Estagio',
       'Candidatura',
       'OfertaEstagio',
