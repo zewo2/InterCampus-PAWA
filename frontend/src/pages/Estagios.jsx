@@ -250,9 +250,10 @@ function Estagios() {
                       </button>
                       <button
                         onClick={() => handleCandidatar(oferta.id_oferta)}
-                        className="bg-linear-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
-                      >
-                        Candidatar
+                        disabled={applyingTo === oferta.id_oferta}
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:from-blue-300 disabled:to-blue-400 disabled:cursor-not-allowed disabled:transform-none"
+                        >
+                        {applyingTo === oferta.id_oferta ? 'A processar...' : 'Candidatar-me'}
                       </button>
                     </div>
                   </div>
