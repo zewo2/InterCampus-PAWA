@@ -106,6 +106,18 @@ const tables = [
     relatorio_texto TEXT,
     id_estagio INTEGER NOT NULL,
     CONSTRAINT estagio_avaliacao FOREIGN KEY (id_estagio) REFERENCES Estagio(id_estagio)
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS DocumentoEstagio (
+    id_documento INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id_estagio INTEGER NOT NULL,
+    nome_original VARCHAR(255) NOT NULL,
+    ficheiro VARCHAR(255) NOT NULL,
+    categoria VARCHAR(100),
+    tipo VARCHAR(100),
+    tamanho INTEGER,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT estagio_documento FOREIGN KEY (id_estagio) REFERENCES Estagio(id_estagio)
   )`
 ];
 
