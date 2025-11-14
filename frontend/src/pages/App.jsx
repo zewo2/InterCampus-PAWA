@@ -7,7 +7,7 @@ import Register from './Auth/Register';
 import Profile from './Profile';
 import Empresas from './Empresas';
 import Estagios from './Estagios';
-import EstagioDetalhes from './EstagioDestalhes';
+import EstagioDetalhes from './EstagioDetalhes';
 import Candidaturas from './Candidaturas';
 import Contacts from './Contacts';
 import Fallback from './Fallback';
