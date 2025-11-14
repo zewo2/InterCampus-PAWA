@@ -11,7 +11,6 @@ function Home() {
   const [query, setQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
-  const [filteredOfertas, setFilteredOfertas] = useState([]);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -32,11 +31,6 @@ function Home() {
     fetchHomeData();
   }, []);
 
-  // Keep filteredOfertas in sync with fetched data
-  useEffect(() => {
-    setFilteredOfertas(homeData?.ofertas || []);
-  }, [homeData]);
-
   // Default values for loading state
   const stats = homeData?.stats || {
     total_empresas: 0,
@@ -45,24 +39,21 @@ function Home() {
     total_candidaturas: 0
   };
 
-  const ofertas = filteredOfertas || [];
+  const featuredOfertas = homeData?.ofertas || [];
   const categories = homeData?.categories || [];
+  const locations = homeData?.locations || [];
 
   const handleSearch = () => {
-    const base = homeData?.ofertas || [];
-    const q = query.trim().toLowerCase();
-    const loc = selectedLocation.trim().toLowerCase();
-    const area = selectedArea.trim().toLowerCase();
-
-    const result = base.filter((o) => {
-      const text = `${o.titulo || ''} ${o.descricao || ''} ${o.nome_empresa || ''} ${o.morada || ''} ${o.tipo_trabalho || ''}`.toLowerCase();
-      const matchesQuery = q ? text.includes(q) : true;
-      const matchesLocation = loc ? (o.morada || '').toLowerCase().includes(loc) : true;
-      const matchesArea = area ? text.includes(area) : true;
-      return matchesQuery && matchesLocation && matchesArea;
-    });
-
-    setFilteredOfertas(result);
+    // Build query params
+    const params = new URLSearchParams();
+    if (query.trim()) params.append('search', query.trim());
+    if (selectedLocation.trim()) params.append('local', selectedLocation.trim());
+    
+    // For area search, use the category name as search term
+    if (selectedArea.trim()) params.append('search', selectedArea.trim());
+    
+    // Navigate to Estagios page with filters
+    window.location.href = `/estagios?${params.toString()}`;
   };
 
   return (
@@ -165,12 +156,9 @@ function Home() {
             </div>
             <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
               <option value="">Localização</option>
-              <option value="lisboa">Lisboa</option>
-              <option value="porto">Porto</option>
-              <option value="coimbra">Coimbra</option>
-              <option value="braga">Braga</option>
-              <option value="faro">Faro</option>
-              <option value="aveiro">Aveiro</option>
+              {locations.map((loc, index) => (
+                <option key={index} value={loc}>{loc}</option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,10 +176,9 @@ function Home() {
             </div>
             <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)} className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
               <option value="">Área</option>
-              <option value="ti">Tecnologia da Informação</option>
-              <option value="marketing">Marketing & Comunicação</option>
-              <option value="design">Design & Criatividade</option>
-              <option value="engenharia">Engenharia</option>
+              {categories.map((cat, index) => (
+                <option key={index} value={cat.categoria}>{cat.categoria}</option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,22 +203,34 @@ function Home() {
       <section className="py-16 px-4 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Estágios de Destaque</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {ofertas.slice(0, 6).map((oferta) => (
+          {featuredOfertas.map((oferta) => (
             <div key={oferta.id_oferta} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
               <h3 className="text-xl font-bold mb-2 text-gray-800">{oferta.titulo}</h3>
               <p className="text-gray-600 font-semibold mb-3">{oferta.nome_empresa}</p>
-              <p className="text-gray-600 mb-2 text-sm">{oferta.morada}</p>
+              <p className="text-gray-600 mb-2 text-sm flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                {oferta.local}
+              </p>
               <p className="text-gray-600 mb-4 line-clamp-2">{oferta.descricao}</p>
               <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
-                <span>{oferta.tipo_trabalho}</span>
-                <span>{oferta.remuneracao ? `€${oferta.remuneracao}` : 'Não especificado'}</span>
+                <span className="flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {oferta.duracao} meses
+                </span>
               </div>
-              <button className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                Candidatar
-              </button>
+              <Link 
+                to={`/estagios/${oferta.id_oferta}`}
+                className="block w-full bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center no-underline"
+              >
+                Ver Detalhes
+              </Link>
             </div>
           ))}
-          {ofertas.length === 0 && (
+          {featuredOfertas.length === 0 && (
             <div className="col-span-3 text-center text-gray-500 py-8">
               Nenhum estágio disponível de momento
             </div>
@@ -271,9 +270,10 @@ function Home() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.length > 0 ? (
             categories.map((cat, index) => (
-              <div 
-                key={index} 
-                className="group cursor-pointer bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border-2 border-transparent hover:border-blue-500 transform hover:-translate-y-2"
+              <Link
+                key={index}
+                to={`/estagios?search=${encodeURIComponent(cat.categoria)}`}
+                className="group cursor-pointer bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border-2 border-transparent hover:border-blue-500 transform hover:-translate-y-2 no-underline"
               >
                 <div className="bg-blue-100 w-16 h-16 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-all group-hover:scale-110">
                   <svg className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +284,7 @@ function Home() {
                   {cat.categoria}
                 </h3>
                 <p className="text-gray-500 text-sm font-medium">{cat.total} vagas</p>
-              </div>
+              </Link>
             ))
           ) : (
             <div className="col-span-full text-center py-10">

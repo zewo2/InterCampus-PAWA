@@ -21,14 +21,34 @@ exports.getAll = async (req, res, next) => {
     }
 
     if (search) {
-      query += ' AND (o.titulo LIKE ? OR o.descricao LIKE ? OR o.requisitos LIKE ?)';
-      const searchPattern = `%${search}%`;
-      params.push(searchPattern, searchPattern, searchPattern);
+      // Split search term into keywords and build OR conditions
+      const keywords = search.trim().split(/\s+/); // Split by whitespace
+      
+      if (keywords.length > 1) {
+        // Multiple keywords - search for ANY match (OR logic)
+        const orConditions = [];
+        keywords.forEach(() => {
+          orConditions.push('o.titulo LIKE ? OR o.descricao LIKE ? OR o.requisitos LIKE ?');
+        });
+        query += ` AND (${orConditions.join(' OR ')})`;
+        
+        // Add each keyword 3 times (for titulo, descricao, requisitos)
+        keywords.forEach(keyword => {
+          const pattern = `%${keyword}%`;
+          params.push(pattern, pattern, pattern);
+        });
+      } else {
+        // Single keyword - simple search
+        query += ' AND (o.titulo LIKE ? OR o.descricao LIKE ? OR o.requisitos LIKE ? OR e.nome_empresa LIKE ?)';
+        const searchPattern = `%${search}%`;
+        params.push(searchPattern, searchPattern, searchPattern, searchPattern);
+      }
     }
 
     if (local) {
-      query += ' AND o.local LIKE ?';
-      params.push(`%${local}%`);
+      query += ' AND (o.local LIKE ? OR e.morada LIKE ?)';
+      const localPattern = `%${local}%`;
+      params.push(localPattern, localPattern);
     }
 
     if (duracao) {
