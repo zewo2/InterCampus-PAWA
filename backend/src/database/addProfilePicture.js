@@ -65,11 +65,11 @@ async function addProfilePictureColumn() {
     if (connection) {
       try {
         await connection.end();
+        console.log('Conexão encerrada.');
       } catch (e) {
         console.warn('Erro ao encerrar a conexão:', e.message);
       }
     }
-    console.log('Conexão encerrada.');
   }
 }
 
