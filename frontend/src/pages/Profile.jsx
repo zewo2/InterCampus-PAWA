@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 // --- SVG Icons ---
 const UserIcon = ({ className = "h-6 w-6" }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
@@ -19,6 +20,12 @@ function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ nome: '', email: '' });
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePicturePreview, setProfilePicturePreview] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -47,8 +54,96 @@ function Profile() {
     };
 
     setUser(JSON.parse(storedUser));
+    // prefill edit form from stored user for quicker editing
+    try {
+      const su = JSON.parse(storedUser);
+      setEditForm({ nome: su.nome || '', email: su.email || '' });
+      if (su.profile_picture) setProfilePicturePreview(`${BACKEND_URL}/${su.profile_picture}`);
+    } catch {
+      // ignore
+    }
     fetchUserData();
   }, [navigate]);
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // cancel edits -> reset
+      setEditForm({ nome: user?.nome || '', email: user?.email || '' });
+      setProfilePicture(null);
+      setProfilePicturePreview(user?.profile_picture ? `${BACKEND_URL}/${user.profile_picture}` : null);
+      setSuccessMessage('');
+      setError('');
+    } else {
+      setSuccessMessage('');
+      setError('');
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const handleInputChange = (e) => setEditForm({ ...editForm, [e.target.name]: e.target.value });
+
+  const handlePictureChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('A imagem deve ter no máximo 5MB');
+      setProfilePicture(null);
+      setProfilePicturePreview(null);
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setError('Por favor selecione uma imagem válida');
+      setProfilePicture(null);
+      setProfilePicturePreview(null);
+      return;
+    }
+
+    setProfilePicture(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setProfilePicturePreview(reader.result);
+    reader.onerror = () => setError('Erro ao carregar pré-visualização da imagem');
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveChanges = async () => {
+    setError('');
+    setSuccessMessage('');
+    setSaving(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('nome', editForm.nome);
+      formData.append('email', editForm.email);
+      if (profilePicture) formData.append('profilePicture', profilePicture);
+
+      const response = await fetch(`${API_URL}/auth/update-profile`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || 'Erro ao atualizar perfil');
+
+      const updatedUser = data.user;
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      window.dispatchEvent(new Event('storage'));
+
+      setSuccessMessage('Perfil atualizado com sucesso!');
+      setIsEditing(false);
+      setProfilePicture(null);
+      setProfilePicturePreview(updatedUser.profile_picture ? `${BACKEND_URL}/${updatedUser.profile_picture}` : null);
+    } catch (err) {
+      setError(err.message || 'Erro ao atualizar perfil');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleLogout = () => {
     toast.info(`Sessão terminada. Até breve, ${user?.nome || 'utilizador'}!`);
@@ -120,16 +215,31 @@ function Profile() {
           
           {/* Left Column: Profile Card */}
           <div className="md:w-1/3">
-            <div className="bg-white rounded-2xl shadow-xl p-6 text-center">
-              <div className="h-32 w-32 rounded-full bg-blue-100 flex items-center justify-center text-5xl font-bold text-blue-600 ring-4 ring-white mx-auto">
-                {user?.nome?.charAt(0).toUpperCase()}
+            <div className="bg-white rounded-2xl shadow-xl p-6 text-center relative">
+              <div className="relative mx-auto h-32 w-32 rounded-full bg-blue-100 flex items-center justify-center text-5xl font-bold text-blue-600 ring-4 ring-white overflow-hidden">
+                {profilePicturePreview ? (
+                  <img src={profilePicturePreview} alt="Pré-visualização" className="w-full h-full object-cover" />
+                ) : user?.profile_picture ? (
+                  <img src={`${BACKEND_URL}/${user.profile_picture}`} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  user?.nome?.charAt(0).toUpperCase()
+                )}
+                {isEditing && (
+                  <label className="absolute bottom-0 right-0 bg-white rounded-full p-1 cursor-pointer shadow-lg hover:bg-gray-100">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <input type="file" accept="image/*" onChange={handlePictureChange} className="hidden" />
+                  </label>
+                )}
               </div>
               <h1 className="text-2xl font-bold text-gray-800 mt-4">{user?.nome}</h1>
               <span className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-${currentRole.color}-100 text-${currentRole.color}-800`}>
                 {currentRole.title}
               </span>
               <p className="text-gray-500 text-sm mt-2">{user?.email}</p>
-              
+
               <div className="mt-6 space-y-3">
                 <button
                   onClick={handleLogout}
@@ -145,22 +255,51 @@ function Profile() {
           {/* Right Column: Details & Next Steps */}
           <div className="md:w-2/3 mt-8 md:mt-0">
             <div className="bg-white rounded-2xl shadow-xl">
-              <div className="p-6 border-b border-gray-200">
+              <div className="p-6 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-800">Detalhes da Conta</h2>
+                <div className="flex items-center gap-2">
+                  {isEditing ? (
+                    <>
+                      <button
+                        onClick={handleSaveChanges}
+                        disabled={saving}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-green-300"
+                      >{saving ? 'A guardar...' : 'Guardar'}</button>
+                      <button
+                        onClick={handleEditToggle}
+                        disabled={saving}
+                        className="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg font-medium hover:bg-gray-300"
+                      >Cancelar</button>
+                    </>
+                  ) : (
+                    <button onClick={handleEditToggle} className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100">
+                      <PencilIcon />
+                      Editar
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-100 p-3 rounded-lg"><UserIcon className="h-6 w-6 text-blue-600" /></div>
-                  <div>
+                  <div className="w-full">
                     <p className="text-sm text-gray-500">Nome Completo</p>
-                    <p className="font-semibold text-gray-800">{user?.nome}</p>
+                    {isEditing ? (
+                      <input name="nome" value={editForm.nome} onChange={handleInputChange} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md" />
+                    ) : (
+                      <p className="font-semibold text-gray-800">{user?.nome}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-100 p-3 rounded-lg"><MailIcon className="h-6 w-6 text-blue-600" /></div>
-                  <div>
+                  <div className="w-full">
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-semibold text-gray-800">{user?.email}</p>
+                    {isEditing ? (
+                      <input name="email" value={editForm.email} onChange={handleInputChange} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md" />
+                    ) : (
+                      <p className="font-semibold text-gray-800">{user?.email}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -178,6 +317,12 @@ function Profile() {
                   </div>
                 </div>
               </div>
+              {successMessage && (
+                <div className="p-4 mx-6 mb-4 bg-green-100 border border-green-300 text-green-800 rounded">{successMessage}</div>
+              )}
+              {error && (
+                <div className="p-4 mx-6 mb-4 bg-red-100 border border-red-300 text-red-800 rounded">{error}</div>
+              )}
             </div>
 
             {nextSteps[user?.role] && (

@@ -8,6 +8,10 @@ function Home() {
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [query, setQuery] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedArea, setSelectedArea] = useState('');
+  const [filteredOfertas, setFilteredOfertas] = useState([]);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -28,6 +32,11 @@ function Home() {
     fetchHomeData();
   }, []);
 
+  // Keep filteredOfertas in sync with fetched data
+  useEffect(() => {
+    setFilteredOfertas(homeData?.ofertas || []);
+  }, [homeData]);
+
   // Default values for loading state
   const stats = homeData?.stats || {
     total_empresas: 0,
@@ -36,8 +45,26 @@ function Home() {
     total_candidaturas: 0
   };
 
-  const ofertas = homeData?.ofertas || [];
+  const ofertas = filteredOfertas || [];
   const categories = homeData?.categories || [];
+
+  const handleSearch = () => {
+    const base = homeData?.ofertas || [];
+    const q = query.trim().toLowerCase();
+    const loc = selectedLocation.trim().toLowerCase();
+    const area = selectedArea.trim().toLowerCase();
+
+    const result = base.filter((o) => {
+      const text = `${o.titulo || ''} ${o.descricao || ''} ${o.nome_empresa || ''} ${o.morada || ''} ${o.tipo_trabalho || ''}`.toLowerCase();
+      const matchesQuery = q ? text.includes(q) : true;
+      const matchesLocation = loc ? (o.morada || '').toLowerCase().includes(loc) : true;
+      const matchesArea = area ? text.includes(area) : true;
+      return matchesQuery && matchesLocation && matchesArea;
+    });
+
+    setFilteredOfertas(result);
+  };
+
   return (
     <div className="App">
       {/* Loading State */}
@@ -60,22 +87,49 @@ function Home() {
           {/* Hero Section */}
           <section className="hero">
             <header className="hero-container">
-              <div className="hero-content">
-                <h1 className="hero-title">Encontre o estágio ideal para sua carreira</h1>
-                <p className="hero-description">
-                  Conectamos estudantes talentosos com as melhores oportunidades de estágio em empresas de destaque
-                </p>
-                <div className="flex gap-4 mt-6">
-                  <Link to="/estagios" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#2563eb] transition-colors no-underline">
-                    Procurar Estágios
-                  </Link>
-                  <Link to="/empresas" className="bg-white text-blue-600  px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors no-underline">
-                    Para Empresas
-                  </Link>
+              <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                {/* Hero Content */}
+                <div className="flex-1 text-center lg:text-left px-4 lg:px-0">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
+                    Encontre o estágio ideal para sua carreira
+                  </h1>
+                  
+                  {/* Hero Image - Only visible on mobile, positioned after title */}
+                  <div className="flex lg:hidden items-center justify-center w-full mb-6">
+                    <img 
+                      src={image1} 
+                      alt="Imagem de pessoas em reunião" 
+                      className="w-full max-w-md h-auto rounded-2xl shadow-lg object-cover"
+                    />
+                  </div>
+
+                  <p className="text-base md:text-lg lg:text-xl mb-6 lg:mb-8 opacity-90">
+                    Conectamos estudantes talentosos com as melhores oportunidades de estágio em empresas de destaque
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-6 px-4 sm:px-0 mb-8 lg:mb-0">
+                    <Link 
+                      to="/estagios"
+                      className="bg-transparent border-2 border-white text-white px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#2563eb] transition-colors no-underline"
+                    >
+                      Procurar Estágios
+                    </Link>
+                    <Link 
+                      to="/empresas" 
+                      className="bg-white text-blue-600 px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors no-underline"
+                    >
+                      Para Empresas
+                    </Link>
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1 flex items-center justify-center">
-                <img src={image1} alt="Imagem de pessoas em reunião" className="w-full max-w-xl h-auto rounded-2xl shadow-lg object-cover"/>
+
+                {/* Hero Image - Only visible on desktop */}
+                <div className="hidden lg:flex flex-1 items-center justify-center w-full px-4 lg:px-0">
+                  <img 
+                    src={image1} 
+                    alt="Imagem de pessoas em reunião" 
+                    className="w-full max-w-md lg:max-w-xl h-auto rounded-2xl shadow-lg object-cover"
+                  />
+                </div>
               </div>
             </header>
           </section>
@@ -94,6 +148,9 @@ function Home() {
             <input
               type="text"
               placeholder="Que tipo de estágio procuras?"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } }}
               className="w-full pl-16 pr-6 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 placeholder:text-gray-500 shadow-inner border-2 border-transparent focus:border-blue-300 transition-all"
             />
           </div>
@@ -106,7 +163,7 @@ function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <select className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
+            <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
               <option value="">Localização</option>
               <option value="lisboa">Lisboa</option>
               <option value="porto">Porto</option>
@@ -129,7 +186,7 @@ function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <select className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
+            <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)} className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
               <option value="">Área</option>
               <option value="ti">Tecnologia da Informação</option>
               <option value="marketing">Marketing & Comunicação</option>
@@ -144,7 +201,7 @@ function Home() {
           </div>
 
           {/* Search Button */}
-          <button className="relative overflow-hidden bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-lg transition-all shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 hover:bg-blue-700 group">
+          <button type="button" onClick={handleSearch} className="relative overflow-hidden bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-lg transition-all shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 hover:bg-blue-700 group">
             <span className="relative z-10 flex items-center justify-center">
               <span className="mr-2">Pesquisar</span>
               <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,7 +252,7 @@ function Home() {
           </div>
           <div className="text-center">
             <h3 className="text-4xl font-bold text-blue-600 mb-2">{stats.total_alunos}+</h3>
-            <p className="text-gray-600">Estudantes Cadastrados</p>
+            <p className="text-gray-600">Estudantes Registados</p>
           </div>
           <div className="text-center">
             <h3 className="text-4xl font-bold text-blue-600 mb-2">{stats.total_candidaturas}+</h3>

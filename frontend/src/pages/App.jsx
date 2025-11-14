@@ -8,7 +8,10 @@ import Register from './Auth/Register';
 import Profile from './Profile';
 import Empresas from './Empresas';
 import Estagios from './Estagios';
+import EstagioDetalhes from './EstagioDestalhes';
+
 import Candidaturas from './Candidaturas';
+import Contacts from './Contacts';
 
 import Footer from '../components/Footer';
 import 'react-toastify/dist/ReactToastify.css';
@@ -26,8 +29,9 @@ const App = () => {
           <Route path="/perfil" element={<Profile />} />
           <Route path="/empresas" element={<Empresas />} />
           <Route path="/estagios" element={<Estagios />} />
+          <Route path="/estagios/:id" element={<EstagioDetalhes />} />
           <Route path="/candidaturas" element={<Candidaturas />} />
-     
+          <Route path="/contactos" element={<Contacts />} />
         </Routes>
         <Footer />
         <ToastContainer position="bottom-right" theme="colored" newestOnTop pauseOnFocusLoss={false} closeOnClick autoClose={4000} />
