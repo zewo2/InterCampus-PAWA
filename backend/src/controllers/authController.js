@@ -82,6 +82,7 @@ exports.login = async (req, res, next) => {
     // Find user
     const [users] = await pool.query('SELECT * FROM Utilizador WHERE email = ?', [email]);
     if (users.length === 0) {
+      console.log(`Login failed: Email not found - ${email}`);
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
 
@@ -90,6 +91,7 @@ exports.login = async (req, res, next) => {
     // Verify password
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
+      console.log(`Login failed: Invalid password for email - ${email}`);
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
 

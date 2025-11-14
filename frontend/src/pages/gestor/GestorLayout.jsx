@@ -240,8 +240,14 @@ const GestorLayout = () => {
             <p className="text-xs text-gray-500">{user?.email || 'Sessão ativa'}</p>
           </div>
           <button
+            onClick={() => navigate('/')}
+            className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 transition-colors"
+          >
+            Voltar ao Site
+          </button>
+          <button
             onClick={handleLogout}
-            className="mt-4 w-full rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-red-600 transition-colors"
+            className="mt-3 w-full rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-red-600 transition-colors"
           >
             Terminar sessão
           </button>

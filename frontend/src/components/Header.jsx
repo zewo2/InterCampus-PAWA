@@ -70,6 +70,15 @@ const Header = () => {
             <div className="hidden md:flex items-center gap-4">
               {user ? (
                 <>
+                  {/* Dashboard button for users with dashboard roles */}
+                  {(user.role === 'Professor' || user.role === 'Empresa' || user.role === 'Gestor') && (
+                    <Link 
+                      to={`/${user.role.toLowerCase()}/dashboard`} 
+                      className="bg-blue-600 text-white font-semibold text-sm py-2 px-4 rounded-full shadow hover:bg-blue-700 transition no-underline"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
                   <Link to="/perfil" className="text-black font-bold text-[15px] hover:text-blue-700 transition-colors no-underline">Perfil</Link>
                   <button onClick={handleLogoutClick} className="bg-blue-600 text-white font-semibold text-sm py-2 px-4 rounded-full shadow hover:bg-red-700 transition">Sair</button>
                 </>
@@ -105,6 +114,16 @@ const Header = () => {
             <div className="pt-2 border-t border-gray-100">
               {user ? (
                 <>
+                  {/* Dashboard button for users with dashboard roles */}
+                  {(user.role === 'Professor' || user.role === 'Empresa' || user.role === 'Gestor') && (
+                    <Link 
+                      to={`/${user.role.toLowerCase()}/dashboard`} 
+                      onClick={()=>setMenuOpen(false)} 
+                      className="block bg-blue-600 text-white text-center py-2 rounded-md mb-2 font-semibold"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
                   <Link to="/perfil" onClick={()=>setMenuOpen(false)} className="block text-gray-800 font-semibold py-2">Perfil</Link>
                   <button onClick={()=>{ setMenuOpen(false); handleLogoutClick(); }} className="w-full text-left bg-red-500 text-white px-4 py-2 rounded-md mt-2">Sair</button>
                 </>

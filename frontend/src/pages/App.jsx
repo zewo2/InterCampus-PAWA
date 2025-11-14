@@ -124,7 +124,8 @@ const AppRoutes = () => {
   const location = useLocation();
   const isPrivateArea =
     location.pathname.startsWith('/professor') ||
-    location.pathname.startsWith('/empresa') ||
+    location.pathname.startsWith('/empresa/') ||
+    location.pathname === '/empresa' ||
     location.pathname.startsWith('/gestor');
 
   return (

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -53,19 +52,21 @@ function Login() {
           ? location.state.from.pathname
           : '/';
 
-      if (data.user?.role && data.user.role.toLowerCase() === 'professor') {
-        navigate('/professor/dashboard', { replace: true });
-        return;
-      }
-
-      if (data.user?.role && data.user.role.toLowerCase() === 'empresa') {
-        navigate('/empresa/dashboard', { replace: true });
-        return;
-      }
-
-      if (data.user?.role && data.user.role.toLowerCase() === 'gestor') {
-        navigate('/gestor/dashboard', { replace: true });
-        return;
+      // Redirect based on user role
+      if (data.user?.role) {
+        const role = data.user.role;
+        if (role === 'Professor') {
+          navigate('/professor/dashboard', { replace: true });
+          return;
+        }
+        if (role === 'Empresa') {
+          navigate('/empresa/dashboard', { replace: true });
+          return;
+        }
+        if (role === 'Gestor') {
+          navigate('/gestor/dashboard', { replace: true });
+          return;
+        }
       }
 
       navigate(redirectTarget, { replace: true });
