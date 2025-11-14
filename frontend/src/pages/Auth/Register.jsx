@@ -10,7 +10,10 @@ function Register() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'Aluno'
+    role: 'Aluno',
+    nomeEmpresa: '',
+    nif: '',
+    morada: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,6 +35,19 @@ function Register() {
       return;
     }
 
+    // Validate company-specific fields when applicable
+    if (formData.role === 'Empresa') {
+      if (!formData.nomeEmpresa.trim() || !formData.nif.trim() || !formData.morada.trim()) {
+        setError('Preenche todos os campos da empresa para concluir o registo.');
+        return;
+      }
+
+      if (!/^\d{9}$/.test(formData.nif.trim())) {
+        setError('O NIF deve conter exatamente 9 dígitos.');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -51,7 +67,7 @@ function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Erro ao registar');
+        throw new Error(data.error || data.message || 'Erro ao registar');
       }
 
       // Store token and user info
@@ -61,7 +77,33 @@ function Register() {
       // Trigger header update
       window.dispatchEvent(new Event('storage'));
 
-      // Redirect to home
+      if (formData.role === 'Empresa') {
+        const companyResponse = await fetch(`${API_URL}/empresas`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${data.token}`
+          },
+          body: JSON.stringify({
+            nome_empresa: formData.nomeEmpresa.trim(),
+            NIF: formData.nif.trim(),
+            morada: formData.morada.trim(),
+            id_utilizador: data.user.id
+          })
+        });
+
+        const companyPayload = await companyResponse.json();
+
+        if (!companyResponse.ok) {
+          setError(companyPayload.error || 'Erro ao concluir o registo da empresa. Tenta novamente no separador Perfil.');
+          return;
+        }
+
+        navigate('/empresa/dashboard', { replace: true });
+        return;
+      }
+
+      // Redirect to home for other roles
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -139,6 +181,58 @@ function Register() {
                 <option value="Professor">Professor</option>
               </select>
             </div>
+            {formData.role === 'Empresa' && (
+              <div className="space-y-4 pt-4 border-t border-gray-200">
+                <div>
+                  <label htmlFor="nomeEmpresa" className="block text-sm font-medium text-gray-700 mb-1">
+                    Nome da Empresa
+                  </label>
+                  <input
+                    id="nomeEmpresa"
+                    name="nomeEmpresa"
+                    type="text"
+                    required
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Nome legal da empresa"
+                    value={formData.nomeEmpresa}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="nif" className="block text-sm font-medium text-gray-700 mb-1">
+                    NIF
+                  </label>
+                  <input
+                    id="nif"
+                    name="nif"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="\d{9}"
+                    maxLength={9}
+                    required
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="000000000"
+                    value={formData.nif}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="morada" className="block text-sm font-medium text-gray-700 mb-1">
+                    Morada
+                  </label>
+                  <input
+                    id="morada"
+                    name="morada"
+                    type="text"
+                    required
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Morada completa da empresa"
+                    value={formData.morada}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            )}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
