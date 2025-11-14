@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           <div>
             <h3 className="text-base font-semibold mb-1">InterCampus</h3>
-            <p className="text-sm text-white/80">Conectando Talentos com oportunidades desde 2020</p>
+            <p className="text-sm text-white/80">Conectando Talentos com oportunidades desde 2025</p>
           </div>
 
           <div>

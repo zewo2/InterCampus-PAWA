@@ -10,6 +10,8 @@ import Estagios from './Estagios';
 import EstagioDetalhes from './EstagioDetalhes';
 import Candidaturas from './Candidaturas';
 import Contacts from './Contacts';
+import Termos from './Termos';
+import Privacidade from './Privacidade';
 import Fallback from './Fallback';
 import Footer from '../components/Footer';
 import ProfessorLayout from './professor/ProfessorLayout';
@@ -142,6 +144,8 @@ const AppRoutes = () => {
         <Route path="/estagios/:id" element={<EstagioDetalhes />} />
         <Route path="/candidaturas" element={<Candidaturas />} />
         <Route path="/contactos" element={<Contacts />} />
+        <Route path="/termos" element={<Termos />} />
+        <Route path="/privacidade" element={<Privacidade />} />
 
         <Route
           path="/professor/*"
