@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -74,9 +74,9 @@ function Login() {
           </h2>
           <p className="text-gray-600">
             Ainda não tens conta?{' '}
-            <a href="/register" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+            <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
               Criar conta
-            </a>
+            </Link>
           </p>
         </div>
 
@@ -155,7 +155,7 @@ function Login() {
                   Lembrar-me
                 </label>
               </div>
-              <a href="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+              <a href="/recover-password" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
                 Esqueceu a palavra-passe?
               </a>
             </div>
