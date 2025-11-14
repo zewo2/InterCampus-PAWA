@@ -7,6 +7,7 @@ React + Vite frontend application with Tailwind CSS.
 - **React 19** - UI library
 - **Vite 7** - Fast build tool with HMR
 - **Tailwind CSS 4** - Utility-first CSS framework
+- **React Router DOM** - Client-side routing
 - **ESLint** - Code linting
 
 ## Getting Started
@@ -53,11 +54,13 @@ Create or edit `.env.local`:
 
 ```
 VITE_API_URL=http://localhost:3000/api
+VITE_BACKEND_URL=http://localhost:3000
 ```
 
 Access in code:
 ```javascript
 const apiUrl = import.meta.env.VITE_API_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 ```
 
 ## Project Structure
@@ -66,20 +69,31 @@ const apiUrl = import.meta.env.VITE_API_URL;
 frontend/
 ├── public/           # Static assets
 ├── src/
-│   ├── assets/       # Images, fonts, etc.
+│   ├── assets/       # Images, fonts, brand assets
 │   ├── components/   # Reusable React components
+│   │   ├── Header.jsx
+│   │   └── Footer.jsx
 │   ├── pages/        # Page components
 │   │   ├── Auth/     # Authentication pages
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
 │   │   │   └── Recovery.jsx
-│   │   ├── Home.jsx
-│   │   ├── Contacts.jsx
-│   │   └── App.jsx
+│   │   ├── App.jsx         # Main app with routing
+│   │   ├── Home.jsx        # Homepage with stats & featured offers
+│   │   ├── Profile.jsx     # User profile page with picture upload
+│   │   ├── Empresas.jsx    # Companies list page
+│   │   ├── Estagios.jsx    # Internship offers list page
+│   │   ├── Candidaturas.jsx # User applications page
+│   │   └── Contacts.jsx
+│   ├── images/       # Image assets
 │   ├── styles/       # CSS files
+│   │   └── App.css
 │   └── main.jsx      # Entry point
 ├── index.html
 ├── vite.config.js
+├── eslint.config.js
+├── tailwind.config.js
+├── postcss.config.js
 └── package.json
 ```
 
@@ -95,13 +109,83 @@ frontend/
 The backend API URL is configured in `.env.local`. Example:
 
 ```javascript
-// Using fetch
-const response = await fetch(`${import.meta.env.VITE_API_URL}/health`);
+// Get API URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+// Public API call (no auth)
+const response = await fetch(`${API_URL}/empresas`);
 const data = await response.json();
 
-// Or install axios: npm install axios
-import axios from 'axios';
-const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/health`);
+// Protected API call (with JWT token)
+const token = localStorage.getItem('token');
+const response = await fetch(`${API_URL}/candidaturas`, {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  }
+});
+const data = await response.json();
+
+// POST request (e.g., login)
+const response = await fetch(`${API_URL}/auth/login`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ email, password })
+});
+const data = await response.json();
+
+// File upload with FormData (e.g., profile picture)
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const formData = new FormData();
+formData.append('nome', 'John Doe');
+formData.append('email', 'john@example.com');
+formData.append('profilePicture', fileObject); // File from input[type="file"]
+
+const response = await fetch(`${API_URL}/auth/update-profile`, {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`
+    // Don't set Content-Type for FormData - browser sets it automatically
+  },
+  body: formData
+});
+const data = await response.json();
+
+// Display uploaded image
+if (user.profile_picture) {
+  const imageUrl = `${BACKEND_URL}/${user.profile_picture}`;
+  // Use imageUrl in <img src={imageUrl} />
+}
+```
+
+## Routes
+
+- `/` - Home page with stats and featured internships
+- `/login` - Login page
+- `/register` - Registration page
+- `/perfil` - User profile (protected)
+- `/empresas` - Companies list
+- `/estagios` - Internship offers list
+- `/candidaturas` - User applications (protected)
+
+## Authentication
+
+The app uses JWT tokens stored in localStorage:
+
+```javascript
+// After login/register
+localStorage.setItem('token', data.token);
+localStorage.setItem('user', JSON.stringify(data.user));
+
+// Check if logged in
+const user = localStorage.getItem('user');
+const token = localStorage.getItem('token');
+
+// Logout
+localStorage.removeItem('token');
+localStorage.removeItem('user');
 ```
 
 ## Vite Plugins
