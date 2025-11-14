@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -46,8 +47,27 @@ function Login() {
       // Trigger header update
       window.dispatchEvent(new Event('storage'));
 
-      // Redirect to home
-      navigate('/');
+      const redirectTarget =
+        location.state?.from?.pathname && location.state.from.pathname !== '/login'
+          ? location.state.from.pathname
+          : '/';
+
+      if (data.user?.role && data.user.role.toLowerCase() === 'professor') {
+        navigate('/professor/dashboard', { replace: true });
+        return;
+      }
+
+      if (data.user?.role && data.user.role.toLowerCase() === 'empresa') {
+        navigate('/empresa/dashboard', { replace: true });
+        return;
+      }
+
+      if (data.user?.role && data.user.role.toLowerCase() === 'gestor') {
+        navigate('/gestor/dashboard', { replace: true });
+        return;
+      }
+
+      navigate(redirectTarget, { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
