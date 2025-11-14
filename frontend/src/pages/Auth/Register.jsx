@@ -31,6 +31,7 @@ function Register() {
     if (formData.password !== formData.confirmPassword) {
       const mismatchMessage = 'As passwords não coincidem';
       toast.error(mismatchMessage);
+      setError(mismatchMessage);
       return;
     }
 
