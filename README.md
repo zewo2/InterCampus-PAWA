@@ -330,7 +330,7 @@ Year: 2025
 
 ## Authors
 
-Academic project developed at ISTEC for the PAWA course.
+zewo2, dmpl1909, goncalo842, cruxzit
 
 ## Acknowledgments
 
