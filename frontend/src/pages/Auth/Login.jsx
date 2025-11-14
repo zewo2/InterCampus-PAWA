@@ -44,7 +44,7 @@ function Login() {
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // Trigger header update
-      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('userUpdated'));
 
       // Redirect to home
       navigate('/');

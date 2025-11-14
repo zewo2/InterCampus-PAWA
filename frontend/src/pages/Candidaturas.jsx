@@ -25,6 +25,15 @@ function Candidaturas() {
           }
         });
         
+        // If token is invalid/expired (401), clear storage and redirect to login
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.dispatchEvent(new Event('userUpdated'));
+          navigate('/login');
+          return;
+        }
+        
         if (!response.ok) {
           throw new Error('Erro ao carregar candidaturas');
         }
