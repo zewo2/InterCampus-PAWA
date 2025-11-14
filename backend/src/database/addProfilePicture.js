@@ -1,35 +1,37 @@
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
-const mysql = require('mysql2');
-
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE || 'intercampus_db'
-});
+const mysql = require('mysql2/promise');
 
 async function addProfilePictureColumn() {
+  const dbName = process.env.DB_DATABASE || 'intercampus_db';
+  let connection;
+
   try {
-    await connection.promise().connect();
+    connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: dbName
+    });
+
     console.log('Conectado ao MySQL!');
 
     // Check if column already exists
-    const [columns] = await connection.promise().query(`
+    const [columns] = await connection.execute(`
       SELECT COLUMN_NAME 
       FROM INFORMATION_SCHEMA.COLUMNS 
       WHERE TABLE_SCHEMA = ? 
       AND TABLE_NAME = 'Utilizador' 
       AND COLUMN_NAME = 'profile_picture'
-    `, [process.env.DB_DATABASE || 'intercampus_db']);
+    `, [dbName]);
 
     if (columns.length > 0) {
       console.log('A coluna profile_picture já existe na tabela Utilizador.');
     } else {
       // Add profile_picture column to Utilizador table
-      await connection.promise().query(`
+      await connection.execute(`
         ALTER TABLE Utilizador 
         ADD COLUMN profile_picture VARCHAR(500) DEFAULT NULL COMMENT 'Relative path to profile picture'
       `);
@@ -60,7 +62,13 @@ async function addProfilePictureColumn() {
     console.error('❌ Erro durante a migração:', err.message);
     throw err;
   } finally {
-    await connection.promise().end();
+    if (connection) {
+      try {
+        await connection.end();
+      } catch (e) {
+        console.warn('Erro ao encerrar a conexão:', e.message);
+      }
+    }
     console.log('Conexão encerrada.');
   }
 }
