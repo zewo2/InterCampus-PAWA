@@ -346,64 +346,7 @@ function Profile() {
                   <p className="mt-1 text-lg text-gray-900">{user?.email}</p>
                 )}
               </div>
-
-      <div className="relative max-w-6xl mx-auto -mt-32 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:gap-8">
-          
-          {/* Left Column: Profile Card */}
-          <div className="md:w-1/3">
-            <div className="bg-white rounded-2xl shadow-xl p-6 text-center relative">
-              <div className="relative mx-auto h-32 w-32 rounded-full bg-blue-100 flex items-center justify-center text-5xl font-bold text-blue-600 ring-4 ring-white overflow-hidden">
-                {profilePicturePreview ? (
-                  <img src={profilePicturePreview} alt="Pré-visualização" className="w-full h-full object-cover" />
-                ) : user?.profile_picture ? (
-                  <img src={`${BACKEND_URL}/${user.profile_picture}`} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  user?.nome?.charAt(0).toUpperCase()
-                )}
-                {isEditing && (
-                  <label className="absolute bottom-0 right-0 bg-white rounded-full p-1 cursor-pointer shadow-lg hover:bg-gray-100">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <input type="file" accept="image/*" onChange={handlePictureChange} className="hidden" />
-                  </label>
-                )}
-              </div>
-              <h1 className="text-2xl font-bold text-gray-800 mt-4">{user?.nome}</h1>
-              {/*
-                Use a static mapping for Tailwind color classes to ensure JIT compilation.
-              */}
-              {(() => {
-                const colorClasses = {
-                  blue: 'bg-blue-100 text-blue-800',
-                  green: 'bg-green-100 text-green-800',
-                  purple: 'bg-purple-100 text-purple-800',
-                  red: 'bg-red-100 text-red-800',
-                  yellow: 'bg-yellow-100 text-yellow-800',
-                  gray: 'bg-gray-100 text-gray-800',
-                };
-                const colorClass = colorClasses[currentRole?.color] || 'bg-gray-100 text-gray-800';
-                return (
-                  <span className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
-                    {currentRole.title}
-                  </span>
-                );
-              })()}
-              <p className="text-gray-500 text-sm mt-2">{user?.email}</p>
-
-              <div className="mt-6 space-y-3">
-                <button
-                  onClick={handleLogout}
-                  className="w-full bg-blue-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  <LogoutIcon />
-                  Terminar Sessão
-                </button>
-              </div>
             </div>
-          </div>
 
             {/* Actions */}
             <div className="mt-8 flex gap-4">
@@ -444,59 +387,61 @@ function Profile() {
 
             {/* Additional Info based on role */}
             {user?.role === 'Aluno' && (
-              <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-                <h3 className="font-semibold text-blue-900 mb-2">Próximos Passos</h3>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Complete o seu perfil com CV e competências</li>
-                  <li>• Explore as ofertas de estágio disponíveis</li>
-                  <li>• Candidate-se às vagas que interessam</li>
-                </ul>
-              </div>
-              <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 p-3 rounded-lg"><UserIcon className="h-6 w-6 text-blue-600" /></div>
-                  <div className="w-full">
-                    <p className="text-sm text-gray-500">Nome Completo</p>
-                    {isEditing ? (
-                      <input name="nome" value={editForm.nome} onChange={handleInputChange} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md" />
-                    ) : (
-                      <p className="font-semibold text-gray-800">{user?.nome}</p>
-                    )}
+              <>
+                <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                  <h3 className="font-semibold text-blue-900 mb-2">Próximos Passos</h3>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Complete o seu perfil com CV e competências</li>
+                    <li>• Explore as ofertas de estágio disponíveis</li>
+                    <li>• Candidate-se às vagas que interessam</li>
+                  </ul>
+                </div>
+                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-100 p-3 rounded-lg"><UserIcon className="h-6 w-6 text-blue-600" /></div>
+                    <div className="w-full">
+                      <p className="text-sm text-gray-500">Nome Completo</p>
+                      {isEditing ? (
+                        <input name="nome" value={editForm.nome} onChange={handleInputChange} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md" />
+                      ) : (
+                        <p className="font-semibold text-gray-800">{user?.nome}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-100 p-3 rounded-lg"><MailIcon className="h-6 w-6 text-blue-600" /></div>
+                    <div className="w-full">
+                      <p className="text-sm text-gray-500">Email</p>
+                      {isEditing ? (
+                        <input name="email" value={editForm.email} onChange={handleInputChange} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md" />
+                      ) : (
+                        <p className="font-semibold text-gray-800">{user?.email}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-100 p-3 rounded-lg"><IdIcon className="h-6 w-6 text-blue-600" /></div>
+                    <div>
+                      <p className="text-sm text-gray-500">ID do Utilizador</p>
+                      <p className="font-semibold text-gray-800">{user?.id}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="bg-blue-100 p-3 rounded-lg"><RoleIcon className="h-6 w-6 text-blue-600" /></div>
+                    <div>
+                      <p className="text-sm text-gray-500">Tipo de Conta</p>
+                      <p className="font-semibold text-gray-800">{user?.role}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 p-3 rounded-lg"><MailIcon className="h-6 w-6 text-blue-600" /></div>
-                  <div className="w-full">
-                    <p className="text-sm text-gray-500">Email</p>
-                    {isEditing ? (
-                      <input name="email" value={editForm.email} onChange={handleInputChange} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md" />
-                    ) : (
-                      <p className="font-semibold text-gray-800">{user?.email}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 p-3 rounded-lg"><IdIcon className="h-6 w-6 text-blue-600" /></div>
-                  <div>
-                    <p className="text-sm text-gray-500">ID do Utilizador</p>
-                    <p className="font-semibold text-gray-800">{user?.id}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 p-3 rounded-lg"><RoleIcon className="h-6 w-6 text-blue-600" /></div>
-                  <div>
-                    <p className="text-sm text-gray-500">Tipo de Conta</p>
-                    <p className="font-semibold text-gray-800">{user?.role}</p>
-                  </div>
-                </div>
-              </div>
-              {successMessage && (
-                <div className="p-4 mx-6 mb-4 bg-green-100 border border-green-300 text-green-800 rounded">{successMessage}</div>
-              )}
-              {error && (
-                <div className="p-4 mx-6 mb-4 bg-red-100 border border-red-300 text-red-800 rounded">{error}</div>
-              )}
-            </div>
+                {successMessage && (
+                  <div className="p-4 mx-6 mb-4 bg-green-100 border border-green-300 text-green-800 rounded">{successMessage}</div>
+                )}
+                {error && (
+                  <div className="p-4 mx-6 mb-4 bg-red-100 border border-red-300 text-red-800 rounded">{error}</div>
+                )}
+              </>
+            )}
 
             {nextSteps[user?.role] && (
               <div className="bg-white rounded-2xl shadow-xl mt-8">

@@ -113,7 +113,7 @@ function Empresas() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {empresas.map((empresa, index) => (
+            {empresas.map((empresa) => (
               <div
                 key={empresa.id_empresa}
                 className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden group border border-gray-100 hover:border-blue-200 cursor-pointer transform hover:-translate-y-2"
