@@ -7,11 +7,11 @@ import Register from './Auth/Register';
 import Profile from './Profile';
 import Empresas from './Empresas';
 import Estagios from './Estagios';
+import EstagioDetalhes from './EstagioDestalhes';
 import Candidaturas from './Candidaturas';
+import Contacts from './Contacts';
 import Footer from '../components/Footer';
 import '../styles/App.css'
-import EstagioDetalhes from './EstagioDestalhes';    
-import Contacts from './Contacts';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
@@ -30,6 +30,7 @@ const App = () => {
           <Route path="/estagios/:id" element={<EstagioDetalhes />} />
           <Route path="/candidaturas" element={<Candidaturas />} />
           <Route path="/contactos" element={<Contacts />} />
+          <Route path="*" element={<Fallback />} />
         </Routes>
         <Footer />
         <ToastContainer position="bottom-right" theme="colored" newestOnTop pauseOnFocusLoss={false} closeOnClick autoClose={4000} />
