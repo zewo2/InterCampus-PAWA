@@ -8,6 +8,10 @@ function Home() {
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [query, setQuery] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedArea, setSelectedArea] = useState('');
+  const [filteredOfertas, setFilteredOfertas] = useState([]);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -28,6 +32,11 @@ function Home() {
     fetchHomeData();
   }, []);
 
+  // Keep filteredOfertas in sync with fetched data
+  useEffect(() => {
+    setFilteredOfertas(homeData?.ofertas || []);
+  }, [homeData]);
+
   // Default values for loading state
   const stats = homeData?.stats || {
     total_empresas: 0,
@@ -36,8 +45,26 @@ function Home() {
     total_candidaturas: 0
   };
 
-  const ofertas = homeData?.ofertas || [];
+  const ofertas = filteredOfertas || [];
   const categories = homeData?.categories || [];
+
+  const handleSearch = () => {
+    const base = homeData?.ofertas || [];
+    const q = query.trim().toLowerCase();
+    const loc = selectedLocation.trim().toLowerCase();
+    const area = selectedArea.trim().toLowerCase();
+
+    const result = base.filter((o) => {
+      const text = `${o.titulo || ''} ${o.descricao || ''} ${o.nome_empresa || ''} ${o.morada || ''} ${o.tipo_trabalho || ''}`.toLowerCase();
+      const matchesQuery = q ? text.includes(q) : true;
+      const matchesLocation = loc ? (o.morada || '').toLowerCase().includes(loc) : true;
+      const matchesArea = area ? text.includes(area) : true;
+      return matchesQuery && matchesLocation && matchesArea;
+    });
+
+    setFilteredOfertas(result);
+  };
+
   return (
     <div className="App">
       {/* Loading State */}
@@ -121,6 +148,9 @@ function Home() {
             <input
               type="text"
               placeholder="Que tipo de estágio procuras?"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } }}
               className="w-full pl-16 pr-6 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 placeholder:text-gray-500 shadow-inner border-2 border-transparent focus:border-blue-300 transition-all"
             />
           </div>
@@ -133,7 +163,7 @@ function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <select className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
+            <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
               <option value="">Localização</option>
               <option value="lisboa">Lisboa</option>
               <option value="porto">Porto</option>
@@ -156,7 +186,7 @@ function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <select className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
+            <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)} className="appearance-none w-full md:w-52 pl-14 pr-10 py-5 rounded-2xl text-gray-800 text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 bg-linear-to-r from-gray-50 to-gray-100 cursor-pointer shadow-inner border-2 border-transparent focus:border-blue-300 transition-all">
               <option value="">Área</option>
               <option value="ti">Tecnologia da Informação</option>
               <option value="marketing">Marketing & Comunicação</option>
@@ -171,7 +201,7 @@ function Home() {
           </div>
 
           {/* Search Button */}
-          <button className="relative overflow-hidden bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-lg transition-all shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 hover:bg-blue-700 group">
+          <button type="button" onClick={handleSearch} className="relative overflow-hidden bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-lg transition-all shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 hover:bg-blue-700 group">
             <span className="relative z-10 flex items-center justify-center">
               <span className="mr-2">Pesquisar</span>
               <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,76 +213,27 @@ function Home() {
       </section>
 
       {/* Highlighted Internships */}
-      <section className="py-20 px-4 max-w-7xl mx-auto bg-linear-to-b from-gray-50 to-white">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
-            Estágios de Destaque
-          </h2>
-          <p className="text-gray-600 text-lg">
-            Descobre as melhores oportunidades para a tua carreira
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Estágios de Destaque</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ofertas.slice(0, 6).map((oferta) => (
-            <div 
-              key={oferta.id_oferta} 
-              className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 transform hover:-translate-y-1"
-            >
-              <div className="p-6">
-                {/* Header */}
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {oferta.titulo}
-                  </h3>
-                  <p className="text-blue-600 font-semibold text-lg mb-2">
-                    {oferta.nome_empresa}
-                  </p>
-                  <div className="flex items-center text-gray-500 text-sm">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {oferta.morada}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-600 mb-4 line-clamp-3 text-sm leading-relaxed">
-                  {oferta.descricao}
-                </p>
-
-                {/* Info Tags */}
-                <div className="flex flex-wrap gap-2 mb-5">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                    {oferta.tipo_trabalho}
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
-                    {oferta.remuneracao ? `€${oferta.remuneracao}` : 'Aberto'}
-                  </span>
-                </div>
-
-                {/* CTA Button */}
-                <button className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-95 cursor-pointer">
-                  Candidatar Agora
-                </button>
+            <div key={oferta.id_oferta} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <h3 className="text-xl font-bold mb-2 text-gray-800">{oferta.titulo}</h3>
+              <p className="text-gray-600 font-semibold mb-3">{oferta.nome_empresa}</p>
+              <p className="text-gray-600 mb-2 text-sm">{oferta.morada}</p>
+              <p className="text-gray-600 mb-4 line-clamp-2">{oferta.descricao}</p>
+              <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
+                <span>{oferta.tipo_trabalho}</span>
+                <span>{oferta.remuneracao ? `€${oferta.remuneracao}` : 'Não especificado'}</span>
               </div>
+              <button className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                Candidatar
+              </button>
             </div>
           ))}
-          
           {ofertas.length === 0 && (
-            <div className="col-span-full text-center py-16">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <p className="text-gray-500 text-lg font-medium">
-                Nenhum estágio disponível de momento
-              </p>
-              <p className="text-gray-400 text-sm mt-2">
-                Volta em breve para novas oportunidades
-              </p>
+            <div className="col-span-3 text-center text-gray-500 py-8">
+              Nenhum estágio disponível de momento
             </div>
           )}
         </div>
@@ -271,7 +252,7 @@ function Home() {
           </div>
           <div className="text-center">
             <h3 className="text-4xl font-bold text-blue-600 mb-2">{stats.total_alunos}+</h3>
-            <p className="text-gray-600">Estudantes Cadastrados</p>
+            <p className="text-gray-600">Estudantes Registados</p>
           </div>
           <div className="text-center">
             <h3 className="text-4xl font-bold text-blue-600 mb-2">{stats.total_candidaturas}+</h3>
